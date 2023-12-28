@@ -1,0 +1,7 @@
+gitga malumot yuborish
+git add .
+git commit -m 'Bu mening birinchi repozitoriyam va birinchi pushim'
+git push -u origin main
+
+gitdan malumot qabul qilish
+git pull origin main
