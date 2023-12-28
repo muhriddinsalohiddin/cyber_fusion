@@ -1,8 +1,9 @@
 package models
 
 type Comment struct {
-	Id          string
-	Description string
-	CreatedAt   string
-	UpdatedAt   string
+	Id          string `json:"id"`
+	Description string `json:"description"`
+	CreatedAt   string `json:"created_at"`
+	UpdatedAt   string `json:"updated_at"`
+	UserId      string `json:"user_id"`
 }
