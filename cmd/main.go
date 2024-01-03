@@ -14,6 +14,6 @@ func main() {
 	defer stg.Close()
 
 	h := api.NewApi(stg)
-	fmt.Println("BU master BRANCHida yozildi")
+	fmt.Println("BU main bo'lmagan BRANCHida yozildi")
 	h.Run()
 }
