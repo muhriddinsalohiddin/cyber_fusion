@@ -4,6 +4,7 @@ import (
 	"app/api"
 	"app/config"
 	"app/storage"
+	"fmt"
 )
 
 func main() {
@@ -13,6 +14,6 @@ func main() {
 	defer stg.Close()
 
 	h := api.NewApi(stg)
-
+	fmt.Println("BU master BRANCHida yozildi")
 	h.Run()
 }
