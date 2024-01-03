@@ -15,5 +15,6 @@ func main() {
 
 	h := api.NewApi(stg)
 	fmt.Println("BU main bo'lmagan BRANCHida yozildi")
+	fmt.Println("BU main BRANCHida yozildi")
 	h.Run()
 }
