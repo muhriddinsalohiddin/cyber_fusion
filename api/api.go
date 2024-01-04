@@ -20,7 +20,6 @@ func NewApi(stg *storage.Storage) *Api {
 		stg: stg,
 	}
 
-	f.Static("/images", "./images")
 
 	f.Get("/ping", Ping)
 	f.Post("/ping", PostPing)
