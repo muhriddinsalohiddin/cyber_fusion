@@ -17,3 +17,5 @@ func (a *Api) CreateAuthor(c *fiber.Ctx) error {
 	fmt.Println(u)
 	return handlerResponse(c, http.StatusCreated, u)
 }
+
+
