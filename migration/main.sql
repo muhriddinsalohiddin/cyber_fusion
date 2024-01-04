@@ -1,3 +1,4 @@
+-- farrux
 CREATE TABLE "user" (
     id UUID PRIMARY KEY,
     name TEXT NOT NULL,
@@ -10,6 +11,7 @@ CREATE TABLE "user" (
     updated_at TIMESTAMP
 );
 
+-- Saidakbar
 CREATE TABLE "post" (
     id UUID PRIMARY KEY,
     user_id UUID NOT NULL REFERENCES "user" (id),
@@ -18,7 +20,7 @@ CREATE TABLE "post" (
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP
 );
-
+-- Said
 CREATE TABLE "comment" (
     id UUID PRIMARY KEY,
     user_id UUID NOT NULL REFERENCES "user" (id),
@@ -28,6 +30,7 @@ CREATE TABLE "comment" (
     updated_at TIMESTAMP
 );
 
+-- Lazizbek
 CREATE TABLE "like" (
     id UUID PRIMARY KEY,
     user_id UUID NOT NULL REFERENCES "user" (id),
@@ -35,6 +38,7 @@ CREATE TABLE "like" (
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Asror
 CREATE TABLE "notification" (
     id UUID PRIMARY KEY,
     user_id UUID NOT NULL REFERENCES "user" (id),
@@ -43,6 +47,7 @@ CREATE TABLE "notification" (
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+-- MuhammadYusuf
 CREATE TABLE "message" (
     id UUID PRIMARY KEY,
     sender_id UUID NOT NULL REFERENCES "user" (id),
@@ -51,6 +56,7 @@ CREATE TABLE "message" (
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Umar
 CREATE TABLE "book" (
     id UUID PRIMARY KEY,
     title TEXT NOT NULL,
@@ -60,6 +66,7 @@ CREATE TABLE "book" (
     updated_at TIMESTAMP
 );
 
+-- Alibek
 CREATE TABLE "author" (
     id UUID PRIMARY KEY,
     name TEXT NOT NULL,
