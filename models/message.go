@@ -7,3 +7,8 @@ type Message struct {
 	Body       string `json:"body"`
 	CreatedAt  string `json:"created_at"`
 }
+
+type List struct {
+	Messages []*Message `json:"messages"`
+	Cout     int        `json:"count"`
+}
