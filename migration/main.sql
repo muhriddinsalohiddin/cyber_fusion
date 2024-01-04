@@ -11,6 +11,7 @@ CREATE TABLE "user" (
     updated_at TIMESTAMP
 );
 
+
 -- Saidakbar
 CREATE TABLE "post" (
     id UUID PRIMARY KEY,
