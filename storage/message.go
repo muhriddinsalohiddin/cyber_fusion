@@ -16,7 +16,7 @@ func NewMessage(db *sql.DB) *Message {
 	return &Message{db: db}
 }
 
-func (r *Message) Create(m models.Message) error {
+func (r *Message) Create(m *models.Message) error {
 	_, err := r.db.Exec(`
 		INSERT INTO 
 			"message"(
@@ -32,7 +32,7 @@ func (r *Message) Create(m models.Message) error {
 	return nil
 }
 
-func (r *Message) Update(m models.Message) error {
+func (r *Message) Update(m *models.Message) error {
 	_, err := r.db.Exec(`
 	UPDATE 
 		"message"
@@ -43,6 +43,19 @@ func (r *Message) Update(m models.Message) error {
 	`,m.Id,m.Body)
 	if err != nil {
 		return fmt.Errorf("Message Update funcsiyada xato bor akaxon"+err.Error())
+	}
+	return nil
+}
+
+func(r *Message) Delete(m *models.Message) error{
+	_, err := r.db.Exec(`
+	DELETE FROM 
+		"message"
+	WHERE
+		id=$1
+	`,m.Id)
+	if err != nil {
+		return fmt.Errorf("Message Delete funcsiyada xato bor akaxon"+err.Error())
 	}
 	return nil
 }
