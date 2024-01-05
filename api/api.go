@@ -3,6 +3,7 @@ package api
 import (
 	"app/config"
 	"app/storage"
+	//"database/sql"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -10,6 +11,7 @@ import (
 type Api struct {
 	f   *fiber.App
 	stg *storage.Storage
+	//db *sql.DB
 }
 
 func NewApi(stg *storage.Storage) *Api {
@@ -19,7 +21,6 @@ func NewApi(stg *storage.Storage) *Api {
 		f:   f,
 		stg: stg,
 	}
-
 
 	f.Get("/ping", Ping)
 	f.Post("/ping", PostPing)
@@ -32,6 +33,13 @@ func NewApi(stg *storage.Storage) *Api {
 		// u.Get("/:id", a.GetByIdUser)
 		// u.Put("/", a.UpdateUser)
 		// u.Delete("/", a.DeleteUser)
+	}
+	{
+		u:=f.Group("notification")
+		u.Post("/",a.CreateNotification)
+		u.Get("/",a.GetnotificationList)
+		u.Delete("/",a.DeleteNotification)
+		u.Put("/",a.UpdateNotification)
 	}
 
 	return a
