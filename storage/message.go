@@ -53,13 +53,13 @@ func (r *Message) Update(m *models.Message) error {
 	return err
 }
 
-func (r *Message) Delete(m *models.Message) error {
+func (r *Message) Delete(id *string) error {
 	_, err := r.db.Exec(`
 	DELETE FROM 
 		"message"
 	WHERE
 		id=$1
-	`, m.Id)
+	`, id)
 	if err != nil {
 		return fmt.Errorf("Message Delete funcsiyada xato bor akaxon" + err.Error())
 	}
@@ -67,7 +67,7 @@ func (r *Message) Delete(m *models.Message) error {
 }
 
 func (r *List) GetMessageList(m *models.List) error {
-	query:= `
+	query := `
 		SELECT
 			id,sender_id,receiver_id,body,created_at 
 		FROM
