@@ -32,6 +32,7 @@ func (r *Notification) Create(n *models.Notification) error {
 			$1,$2,$3,$4
 		)
 	`, uuid.NewString(), n.UserId, n.Type, n.Body)
+
 	if err != nil {
 		return fmt.Errorf("notification create funcsiyada xato " + err.Error())
 	}
@@ -39,7 +40,7 @@ func (r *Notification) Create(n *models.Notification) error {
 }
 
 func (r *Notification) Update(n *models.Notification) error {
-	_, err := r.db.Exec(`
+	res, err := r.db.Exec(`
 	UPDATE 
 		"notification"
 	SET
@@ -48,14 +49,20 @@ func (r *Notification) Update(n *models.Notification) error {
 	WHERE
 		id=$1
 	`, n.Id, n.Type,n.Body)
+	
 	if err != nil {
 		return fmt.Errorf("Notification Update funcsiyada xato " + err.Error())
+	}
+	if rowsAffected, err := res.RowsAffected(); err != nil {
+		return fmt.Errorf("Notification Update funksiyasida xato (RowsAffected): %v", err)
+	} else if rowsAffected == 0 {
+		return fmt.Errorf("bunday id topilmadi:"+err.Error())
 	}
 	return nil
 }
 
 func (r *Notification) Delete(n *models.Notification) error {
-	_, err := r.db.Exec(`
+	res, err := r.db.Exec(`
 	DELETE FROM 
 		"notification"
 	WHERE
@@ -64,10 +71,17 @@ func (r *Notification) Delete(n *models.Notification) error {
 	if err != nil {
 		return fmt.Errorf("notification Delete funcsiyada xato " + err.Error())
 	}
+	if rowsAffected, err := res.RowsAffected(); err != nil {
+		return fmt.Errorf("Notification Delete funksiyasida xato (RowsAffected): %v", err)
+	} else if rowsAffected == 0 {
+		return fmt.Errorf("bunday id  topilmadi:"+err.Error())
+	}
+
 	return nil
 }
 
-func (r *List) Getlist(m *models.List)  error {
+func (r *Notification) Getlist()( *models.List, error) {
+	var m models.List
 	query := `
 	SELECT
 		id,
@@ -78,12 +92,12 @@ func (r *List) Getlist(m *models.List)  error {
 	FROM "notification"`
 	rows, err := r.db.Query(query)
 	if err != nil {
-		return  fmt.Errorf("queryda ")
+		return nil,  fmt.Errorf("queryda "+err.Error())
 	}
 	defer func() {
 		err = rows.Close()
 		if err != nil {
-			fmt.Println("aka kanal yopilmadi", err)
+			fmt.Println(" kanal yopilmadi", err)
 		}
 	}()
 
@@ -99,12 +113,12 @@ func (r *List) Getlist(m *models.List)  error {
 			&b.CreatedAt,
 		)
 		if err != nil {
-			return  err
+			return  nil,err
 		}
 		m.Notifications = append(m.Notifications, &b)
 	}
 
 	err = r.db.QueryRow(`SELECT COUNT(1) FROM "notification"`).Scan(&m.Count)
 
-	return  err
+	return &m, err
 }

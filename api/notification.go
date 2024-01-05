@@ -15,14 +15,17 @@ func (a *Api) CreateNotification(c *fiber.Ctx) error {
 	if err != nil {
 		return handlerResponse(c, http.StatusBadRequest, "body parcerda xatolik: "+err.Error())
 	}
-	a.stg.Notification.Create(&u)
+	err=a.stg.Notification.Create(&u)
+	if err!=nil{
+		return handlerResponse(c,http.StatusInternalServerError,err)
+	}
 	return handlerResponse(c, http.StatusCreated, u)
 
 }
 func (a *Api) GetnotificationList(c *fiber.Ctx) error {
-	var m models.List
-	err := a.stg.List.Getlist(&m)
-	if err != nil {
+	
+	m,err := a.stg.Notification.Getlist()
+		if err != nil {
 		return handlerResponse(c, http.StatusInternalServerError, err.Error())
 	}
 	return handlerResponse(c,http.StatusOK, m)
