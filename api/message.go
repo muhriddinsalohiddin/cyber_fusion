@@ -13,6 +13,9 @@ func (a *Api) CreateMessage(c *fiber.Ctx) error {
 	if err != nil {
 		return handlerResponse(c, http.StatusBadRequest, "body parcerda xatolik Create: "+err.Error())
 	}
+
+	defer a.stg.Close()
+
 	err = a.stg.Message.Create(&m)
 	if err != nil {
 		return handlerResponse(c, http.StatusInternalServerError, err.Error())
@@ -21,12 +24,12 @@ func (a *Api) CreateMessage(c *fiber.Ctx) error {
 }
 
 func (a *Api) UpdateMessage(c *fiber.Ctx) error {
-	id := c.Params("id")
 	var m models.Message
 	err := c.BodyParser(&m)
 	if err != nil {
 		return handlerResponse(c, http.StatusBadRequest, "body parcerda xatolik Updatedagi: "+err.Error())
 	}
+	id := c.Params("id")
 	err = a.stg.Message.Update(&m,&id)
 	if err != nil {
 		return handlerResponse(c, http.StatusInternalServerError, err.Error())
@@ -46,7 +49,7 @@ func (a *Api) DeleteMessage(c *fiber.Ctx) error {
 
 func (a *Api) GetMessageList(c *fiber.Ctx) error {
 	var m models.List
-	err := a.stg.List.GetMessageList(&m)
+	err := a.stg.Message.GetMessageList(&m)
 	if err != nil {
 		return handlerResponse(c, http.StatusInternalServerError, err.Error())
 	}

@@ -11,15 +11,9 @@ import (
 type Message struct {
 	db *sql.DB
 }
-type List struct {
-	db *sql.DB
-}
 
 func NewMessage(db *sql.DB) *Message {
 	return &Message{db: db}
-}
-func NewList(db *sql.DB) *List {
-	return &List{db: db}
 }
 
 func (r *Message) Create(m *models.Message) error {
@@ -35,10 +29,10 @@ func (r *Message) Create(m *models.Message) error {
 	if err != nil {
 		return fmt.Errorf("Message create funcsiyada xato bor akaxon" + err.Error())
 	}
-	return err
+	return nil
 }
 
-func (r *Message) Update(m *models.Message,id *string) error {
+func (r *Message) Update(m *models.Message, id *string) error {
 	_, err := r.db.Exec(`
 	UPDATE 
 		"message"
@@ -50,7 +44,8 @@ func (r *Message) Update(m *models.Message,id *string) error {
 	if err != nil {
 		return fmt.Errorf("Message Update funcsiyada xato bor akaxon" + err.Error())
 	}
-	return err
+
+	return nil
 }
 
 func (r *Message) Delete(id *string) error {
@@ -63,10 +58,10 @@ func (r *Message) Delete(id *string) error {
 	if err != nil {
 		return fmt.Errorf("Message Delete funcsiyada xato bor akaxon" + err.Error())
 	}
-	return err
+	return nil
 }
 
-func (r *List) GetMessageList(m *models.List) error {
+func (r *Message) GetMessageList(m *models.List) error {
 	query := `
 		SELECT
 			id,sender_id,receiver_id,body,created_at 
@@ -98,7 +93,7 @@ func (r *List) GetMessageList(m *models.List) error {
 }
 
 func (r *Message) GetMessage(m *models.Message, id *string) error {
-	err:= r.db.QueryRow(`
+	err := r.db.QueryRow(`
 	SELECT 
 		id,sender_id,receiver_id,body,created_at
 	FROM
