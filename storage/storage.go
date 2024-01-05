@@ -9,6 +9,8 @@ import (
 type Storage struct {
 	db   *sql.DB
 	User *User
+	Post *Post
+	List *List
 }
 
 func NewStorage(connStr string) *Storage {
@@ -25,6 +27,8 @@ func NewStorage(connStr string) *Storage {
 	return &Storage{
 		db:   db,
 		User: NewUser(db),
+		Post: NewPost(db),
+		List: NewList(db),
 	}
 }
 

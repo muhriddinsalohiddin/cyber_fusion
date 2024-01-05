@@ -5,8 +5,8 @@ import "fmt"
 const (
 	host     = "localhost"
 	pPort    = "5432"
-	user     = "postgres"
-	password = "1"
+	user     = "kali"
+	password = "963"
 	db       = "instagram"
 )
 
