@@ -54,7 +54,7 @@ func (n *User) GetList(id string) (*models.User, error) {
 	to_char(created_at, 'YYYY-MM-DD') as created_at 
 	FROM 
 	"user" 
-	where id='$1'`, id)
+	where id=$1`, id)
 	row.Scan(
 		&u.Id,
 		&u.Name,
