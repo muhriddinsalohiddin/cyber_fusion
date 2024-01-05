@@ -38,7 +38,7 @@ func (r *Message) Create(m *models.Message) error {
 	return err
 }
 
-func (r *Message) Update(m *models.Message) error {
+func (r *Message) Update(m *models.Message,id *string) error {
 	_, err := r.db.Exec(`
 	UPDATE 
 		"message"
@@ -46,7 +46,7 @@ func (r *Message) Update(m *models.Message) error {
 		body=$2
 	WHERE
 		id=$1
-	`, m.Id, m.Body)
+	`, id, m.Body)
 	if err != nil {
 		return fmt.Errorf("Message Update funcsiyada xato bor akaxon" + err.Error())
 	}

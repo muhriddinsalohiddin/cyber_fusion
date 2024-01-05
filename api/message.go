@@ -21,12 +21,13 @@ func (a *Api) CreateMessage(c *fiber.Ctx) error {
 }
 
 func (a *Api) UpdateMessage(c *fiber.Ctx) error {
+	id := c.Params("id")
 	var m models.Message
 	err := c.BodyParser(&m)
 	if err != nil {
 		return handlerResponse(c, http.StatusBadRequest, "body parcerda xatolik Updatedagi: "+err.Error())
 	}
-	err = a.stg.Message.Update(&m)
+	err = a.stg.Message.Update(&m,&id)
 	if err != nil {
 		return handlerResponse(c, http.StatusInternalServerError, err.Error())
 	}
