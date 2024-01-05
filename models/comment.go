@@ -1,4 +1,5 @@
 package models
+<<<<<<< HEAD
 
 type Comment struct {
 	Id        string `json:"id"`
@@ -11,3 +12,5 @@ type List struct {
 	Comments []*Comment `json:"comment"`
 	Count    int        `json:"comment"`
 }
+=======
+>>>>>>> d9baf0fd15d6d098706e618c0340843b65bb3f2c
