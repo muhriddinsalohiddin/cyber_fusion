@@ -11,16 +11,12 @@ import (
 type Notification struct {
 	db *sql.DB
 }
-type List struct{
-	db *sql.DB
-}
+
 
 func NewNotification(db *sql.DB) *Notification {
 	return &Notification{db: db}
 }
-func NewList(db *sql.DB) *List{
-	return &List{db:db}
-}
+
 
 func (r *Notification) Create(n *models.Notification) error {
 	_, err := r.db.Exec(`
@@ -39,7 +35,7 @@ func (r *Notification) Create(n *models.Notification) error {
 	return nil
 }
 
-func (r *Notification) Update(n *models.Notification) error {
+func (r *Notification) Update(id *string, n *models.Notification) error {
 	res, err := r.db.Exec(`
 	UPDATE 
 		"notification"
@@ -48,7 +44,7 @@ func (r *Notification) Update(n *models.Notification) error {
 		type=$3
 	WHERE
 		id=$1
-	`, n.Id, n.Type,n.Body)
+	`, id, n.Type,n.Body)
 	
 	if err != nil {
 		return fmt.Errorf("Notification Update funcsiyada xato " + err.Error())
@@ -61,13 +57,13 @@ func (r *Notification) Update(n *models.Notification) error {
 	return nil
 }
 
-func (r *Notification) Delete(n *models.Notification) error {
+func (r *Notification) Delete(id *string) error {
 	res, err := r.db.Exec(`
 	DELETE FROM 
 		"notification"
 	WHERE
 		id=$1
-	`, n.Id)
+	`, id)
 	if err != nil {
 		return fmt.Errorf("notification Delete funcsiyada xato " + err.Error())
 	}

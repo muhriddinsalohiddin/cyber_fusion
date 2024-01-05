@@ -38,8 +38,8 @@ func NewApi(stg *storage.Storage) *Api {
 		u:=f.Group("notification")
 		u.Post("/",a.CreateNotification)
 		u.Get("/",a.GetnotificationList)
-		u.Delete("/",a.DeleteNotification)
-		u.Put("/",a.UpdateNotification)
+		u.Delete("/:id",a.DeleteNotification)
+		u.Put("/:id",a.UpdateNotification)
 	}
 
 	return a
