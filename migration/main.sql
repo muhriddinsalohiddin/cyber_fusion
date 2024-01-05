@@ -73,3 +73,7 @@ CREATE TABLE "author" (
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP
 ); 
+
+insert into "author" (id, name) Values (
+    'e920be98-1512-42cf-a94f-f4008ff41160', 'Alisher Navoiy'
+);

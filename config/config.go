@@ -7,7 +7,7 @@ const (
 	pPort    = "5432"
 	user     = "postgres"
 	password = "1"
-	db       = "author"
+	db       = "postgres"
 )
 
 var (

@@ -9,13 +9,13 @@ import (
 )
 
 func (a *Api) CreateAuthor(c *fiber.Ctx) error {
-	var u models.Author
-	err := c.BodyParser(&u)
+	var b models.Author
+	err := c.BodyParser(&b)
 	if err!=nil{
 		return handlerResponse(c, http.StatusBadRequest, "body parser da xatolik: " + err.Error())
 	}
-	fmt.Println(u)
-	return handlerResponse(c, http.StatusCreated, u)
+	fmt.Println(b)
+	return handlerResponse(c, http.StatusCreated, "SUCCESS")
 }
 
 
