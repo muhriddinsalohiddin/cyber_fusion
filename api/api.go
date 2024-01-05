@@ -40,7 +40,7 @@ func NewApi(stg *storage.Storage) *Api {
 		u.Post("/", a.CreateMessage)
 		u.Put("/", a.UpdateMessage)
 		u.Delete("/", a.DeleteMessage)
-		// u.Get("/", a.GetUser)
+		u.Get("/", a.GetMessageList)
 		// u.Get("/:id", a.GetByIdUser)
 	}
 
