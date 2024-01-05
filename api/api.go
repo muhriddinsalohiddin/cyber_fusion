@@ -29,7 +29,7 @@ func NewApi(stg *storage.Storage) *Api {
 	{
 		u := f.Group("user")
 		u.Post("/", a.CreateUser)
-		
+
 		// u.Get("/", a.GetUser)
 		// u.Get("/:id", a.GetByIdUser)
 		// u.Put("/", a.UpdateUser)
@@ -38,6 +38,9 @@ func NewApi(stg *storage.Storage) *Api {
 	{
 		b := f.Group("author")
 		b.Post("/", a.CreateAuthor)
+		b.Put("/:id", a.UpdateAuthor)
+		b.Get("/", a.GetAuthorList)
+		b.Delete("/", a.DeleteAuthor)
 	}
 
 	return a
