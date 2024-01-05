@@ -10,7 +10,7 @@ type Comment struct {
 }
 type List struct {
 	Comments []*Comment `json:"comment"`
-	Count    int        `json:"comment"`
+	Count    int        `json:"count"`
 }
 =======
 >>>>>>> d9baf0fd15d6d098706e618c0340843b65bb3f2c
