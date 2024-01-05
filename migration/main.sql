@@ -5,6 +5,7 @@ CREATE TABLE "user" (
     gender BOOLEAN NOT NULL,
     birthday DATE NOT NULL,
     email TEXT NOT NULL,
+    login TEXT NOT NULL,
     password TEXT NOT NULL,
     bio TEXT,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
