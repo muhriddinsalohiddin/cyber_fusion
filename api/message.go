@@ -53,7 +53,12 @@ func (a *Api) GetMessageList(c *fiber.Ctx) error {
 }
 
 func (a *Api) GetMessageById(c *fiber.Ctx) error {
-	// id := c.Params("id")
+	var m models.Message
+	id := c.Params("id")
+	err := a.stg.Message.GetMessage(&m, &id)
+	if err != nil {
+		return handlerResponse(c, http.StatusInternalServerError, err.Error())
+	}
 
-	return nil
+	return handlerResponse(c, http.StatusAccepted,m)
 }

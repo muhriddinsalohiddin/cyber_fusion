@@ -96,3 +96,24 @@ func (r *List) GetMessageList(m *models.List) error {
 
 	return err
 }
+
+func (r *Message) GetMessage(m *models.Message, id *string) error {
+	err:= r.db.QueryRow(`
+	SELECT 
+		id,sender_id,receiver_id,body,created_at
+	FROM
+		"message"
+	WHERE
+		id=$1
+	`, id).Scan(
+		&m.Id,
+		&m.SenderId,
+		&m.ReceiverId,
+		&m.Body,
+		&m.CreatedAt,
+	)
+	if err != nil {
+		return fmt.Errorf("Message Update funcsiyada xato bor akaxon" + err.Error())
+	}
+	return nil
+}
