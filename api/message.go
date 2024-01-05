@@ -46,3 +46,12 @@ func (a *Api) DeleteMessage(c *fiber.Ctx) error {
 
 	return handlerResponse(c, http.StatusAccepted, "SUCCESS, DELETED")
 }
+
+func (a *Api) GetMessageList(c *fiber.Ctx) error {
+	var m models.List
+	err := a.stg.List.GetMessageList(&m)
+	if err != nil {
+		return handlerResponse(c, http.StatusInternalServerError, err.Error())
+	}
+	return handlerResponse(c,http.StatusOK, m)
+}
