@@ -11,15 +11,15 @@ import (
 type Post struct {
 	db *sql.DB
 }
-type List struct{
+type List struct {
 	db *sql.DB
 }
 
 func NewPost(db *sql.DB) *Post {
 	return &Post{db: db}
 }
-func NewList(db *sql.DB) *List{
-	return &List{db:db}
+func NewList(db *sql.DB) *List {
+	return &List{db: db}
 }
 
 func (r *Post) Create(m *models.Post) error {
@@ -31,26 +31,23 @@ func (r *Post) Create(m *models.Post) error {
 		VALUES(
 			$1,$2,$3,$4
 		)
-	`,uuid.NewString(),m.UserId,m.Title,m.Body)
-	if err != nil {
-		return fmt.Errorf("Post create funksiya xato bor akaxon"+err.Error())
-	}
-	return nil
+	`, uuid.NewString(), m.UserId, m.Title, m.Body)
+	return err
 }
 
-
-func(r *Post) Delete(m *models.Post) error{
+func (r *Post) Delete(m *models.Post) error {
 	_, err := r.db.Exec(`
 	DELETE FROM 
 		"post"
 	WHERE
 		id=$1
-	`,m.Id)
+	`, m.Id)
 	if err != nil {
-		return fmt.Errorf("Post Delete funcsiyada xato bor akaxon"+err.Error())
+		return fmt.Errorf("Post Delete funcsiyada xato bor akaxon" + err.Error())
 	}
 	return nil
 }
+
 func (r *Post) Update(n *models.Post) error {
 	_, err := r.db.Exec(`
 	UPDATE 
@@ -58,15 +55,18 @@ func (r *Post) Update(n *models.Post) error {
 	SET
 		body=$2,
 		title=$3
+		updated_at = NOW()
 	WHERE
 		id=$1
-	`, n.Id, n.Body,n.Title)
+	`, n.Id, n.Body, n.Title)
 	if err != nil {
 		return fmt.Errorf("Post Update funksiya xato " + err.Error())
 	}
 	return nil
 }
-func (r *List) GetPostlist(m *models.List)  error {
+
+func (r *List) GetPostlist() (*models.PostListResp, error) {
+	var m models.PostListResp
 	query := `
 	SELECT
 		id,
@@ -77,7 +77,7 @@ func (r *List) GetPostlist(m *models.List)  error {
 	FROM "post"`
 	rows, err := r.db.Query(query)
 	if err != nil {
-		return  fmt.Errorf("queryda ")
+		return nil, fmt.Errorf("queryda ")
 	}
 	defer func() {
 		err = rows.Close()
@@ -88,7 +88,7 @@ func (r *List) GetPostlist(m *models.List)  error {
 
 	for rows.Next() {
 		var (
-			b       models.Post
+			b models.Post
 		)
 		err = rows.Scan(
 			&b.Id,
@@ -98,12 +98,12 @@ func (r *List) GetPostlist(m *models.List)  error {
 			&b.CreatedAt,
 		)
 		if err != nil {
-			return  err
+			return nil, err
 		}
 		m.Post = append(m.Post, &b)
 	}
 
-	err = r.db.QueryRow(`SELECT COUNT(1) FROM "post"`).Scan(&m.Cout)
+	err = r.db.QueryRow(`SELECT COUNT(1) FROM "post"`).Scan(&m.Count)
 
-	return  err
+	return &m, err
 }

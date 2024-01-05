@@ -8,7 +8,8 @@ type Post struct {
 	CreatedAt string `json:"created_at"`
 	UpdatedAt string `json:"updated_at"`
 }
-type List struct {
-	Post []*Post `json:"post"`
-	Cout int     `json:"count"`	
+type PostListResp struct {
+	Post  []*Post `json:"post"`
+	Count int     `json:"count"`
 }
+type PostListReq struct{}
