@@ -12,11 +12,9 @@ type Notification struct {
 	db *sql.DB
 }
 
-
 func NewNotification(db *sql.DB) *Notification {
 	return &Notification{db: db}
 }
-
 
 func (r *Notification) Create(n *models.Notification) error {
 	_, err := r.db.Exec(`
@@ -44,15 +42,15 @@ func (r *Notification) Update(id *string, n *models.Notification) error {
 		type=$3
 	WHERE
 		id=$1
-	`, id, n.Type,n.Body)
-	
+	`, id, n.Type, n.Body)
+
 	if err != nil {
 		return fmt.Errorf("Notification Update funcsiyada xato " + err.Error())
 	}
 	if rowsAffected, err := res.RowsAffected(); err != nil {
 		return fmt.Errorf("Notification Update funksiyasida xato (RowsAffected): %v", err)
 	} else if rowsAffected == 0 {
-		return fmt.Errorf("bunday id topilmadi:"+err.Error())
+		return fmt.Errorf("bunday id topilmadi:" + err.Error())
 	}
 	return nil
 }
@@ -70,15 +68,15 @@ func (r *Notification) Delete(id *string) error {
 	if rowsAffected, err := res.RowsAffected(); err != nil {
 		return fmt.Errorf("Notification Delete funksiyasida xato (RowsAffected): %v", err)
 	} else if rowsAffected == 0 {
-		return fmt.Errorf("bunday id  topilmadi:"+err.Error())
+		return fmt.Errorf("bunday id  topilmadi:" + err.Error())
 	}
 
 	return nil
 }
 
-func (r *Notification) Getlist()( *models.List, error) {
-	var m models.List
-	query := `
+func (r *Notification) Getlist(req *models.Notification) (*models.List, error) {
+	var( m models.List
+	query = `
 	SELECT
 		id,
 		user_id,
@@ -86,9 +84,16 @@ func (r *Notification) Getlist()( *models.List, error) {
 		body,
 		created_at
 	FROM "notification"`
-	rows, err := r.db.Query(query)
+    filter=" Where 1=1 "
+    args  []any)
+	if req.UserId !=""{
+		args=append(args,req.UserId )
+		filter +=" AND user_id=$"+fmt.Sprint(len(args))
+	}
+	query=query+filter
+	rows, err := r.db.Query(query,args...)
 	if err != nil {
-		return nil,  fmt.Errorf("queryda "+err.Error())
+		return nil, fmt.Errorf("queryda " + err.Error())
 	}
 	defer func() {
 		err = rows.Close()
@@ -99,7 +104,7 @@ func (r *Notification) Getlist()( *models.List, error) {
 
 	for rows.Next() {
 		var (
-			b       models.Notification
+			b models.Notification
 		)
 		err = rows.Scan(
 			&b.Id,
@@ -109,12 +114,12 @@ func (r *Notification) Getlist()( *models.List, error) {
 			&b.CreatedAt,
 		)
 		if err != nil {
-			return  nil,err
+			return nil, err
 		}
 		m.Notifications = append(m.Notifications, &b)
 	}
 
-	err = r.db.QueryRow(`SELECT COUNT(1) FROM "notification"`).Scan(&m.Count)
+	err = r.db.QueryRow(`SELECT COUNT(1) FROM "notification"`+filter, args...).Scan(&m.Count)
 
 	return &m, err
 }

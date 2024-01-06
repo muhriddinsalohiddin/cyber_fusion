@@ -23,8 +23,11 @@ func (a *Api) CreateNotification(c *fiber.Ctx) error {
 
 }
 func (a *Api) GetnotificationList(c *fiber.Ctx) error {
-	
-	m,err := a.stg.Notification.Getlist()
+	var req =models.Notification{
+		UserId: c.Query("user_id"),
+	}
+	 
+		m,err := a.stg.Notification.Getlist(&req)
 		if err != nil {
 		return handlerResponse(c, http.StatusInternalServerError, err.Error())
 	}
@@ -46,15 +49,6 @@ func (a *Api) UpdateNotification(c *fiber.Ctx) error {
 	return handlerResponse(c, http.StatusAccepted, "SUCCESS, UPDATED")
 }
 
-// func (a *Api) DeleteNotification(c *fiber.Ctx) error {
-// 	Id:=c.Params("id")
-// 	err := a.stg.Notification.Delete(Id)
-// 	if err!=nil{
-// 		return handlerResponse(c, http.StatusInternalServerError, err.Error())
-// 	}
-
-// 	return handlerResponse(c, http.StatusAccepted, "SUCCESS, DELETED")
-// }
 func (a *Api) DeleteNotification(c *fiber.Ctx) error {
 	id := c.Params("id")
 	err := a.stg.Notification.Delete(&id)
