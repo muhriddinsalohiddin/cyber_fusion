@@ -31,7 +31,11 @@ func NewApi(stg *storage.Storage) *Api {
 		u.Post("/", a.CreateUser)
 		u.Get("/", a.GetUser)
 		u.Get("/:id", a.GetByIdUser)
+<<<<<<< HEAD
 		u.Put("/", a.UpdateUser)
+=======
+		u.Put("/:id", a.UpdateUser)
+>>>>>>> d922356 (farrux last edit)
 		u.Delete("/", a.DeleteUser)
 	}
 
