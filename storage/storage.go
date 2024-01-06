@@ -14,12 +14,12 @@ type Storage struct {
 func NewStorage(connStr string) *Storage {
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
-		panic(err)
+		return nil
 	}
 
 	err = db.Ping()
 	if err != nil {
-		panic(err)
+		return nil
 	}
 
 	return &Storage{

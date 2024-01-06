@@ -32,7 +32,7 @@ func NewApi(stg *storage.Storage) *Api {
 		u.Get("/", a.GetUser)
 		u.Get("/:id", a.GetByIdUser)
 		u.Put("/:id", a.UpdateUser)
-		u.Delete("/", a.DeleteUser)
+		u.Delete("/:id", a.DeleteUser)
 	}
 
 	return a

@@ -41,7 +41,7 @@ email=$4,
 login=$5, 
 password=$6, 
 bio=$7,
-updated_at=now() where id=$8`,u1.Name, u1.Gender, u1.Birthday, u1.Email, u1.Login, u1.Password, u1.Bio, id)
+updated_at=now() where id=$8`, u1.Name, u1.Gender, u1.Birthday, u1.Email, u1.Login, u1.Password, u1.Bio, id)
 	if err != nil {
 		return err
 	}
@@ -49,15 +49,16 @@ updated_at=now() where id=$8`,u1.Name, u1.Gender, u1.Birthday, u1.Email, u1.Logi
 
 }
 
-func (d *User) Delete(id string) error{
-_, err := d.db.Exec(`DELETE FROM "user" WHERE id=$1`, id)
-if err!=nil{
-	return fmt.Errorf("User delete funksiyada xatolik kettiyou brat"+err.Error())
-}
-return nil
+func (d *User) Delete(id string) error {
+	_, err := d.db.Exec(`DELETE FROM "user" WHERE id=$1`, id)
+	if err != nil {
+		return fmt.Errorf("User delete funksiyada xatolik kettiyou brat" + err.Error())
+	}
+	return nil
 }
 
 func (n *User) GetById(id string) (*models.User, error) {
+	var updatedAt sql.NullString
 	var u models.User
 	row := n.db.QueryRow(`SELECT id, 
 	name, 
@@ -67,7 +68,8 @@ func (n *User) GetById(id string) (*models.User, error) {
 	login, 
 	password, 
 	bio, 
-	to_char(created_at, 'YYYY-MM-DD') as created_at 
+	to_char(created_at, 'YYYY-MM-DD') as created_at,
+	to_char(updated_at, 'YYYY-MM-DD') as updated_at 
 	FROM 
 	"user" 
 	where id=$1`, id)
@@ -80,14 +82,23 @@ func (n *User) GetById(id string) (*models.User, error) {
 		&u.Login,
 		&u.Password,
 		&u.Bio,
-		&u.CreatedAt)
-	// Send users as JSON response using Fiber
-	fmt.Println(u)
+		&u.CreatedAt,
+		&u.UpdetadAt)
+
+	if updatedAt.Valid {
+		u.UpdetadAt = updatedAt.String
+	}
+	defer n.db.Close()
+
 	return &u, nil
+
 }
 func (n *User) Get() (*models.Users, error) {
-	var m models.Users
-	var u models.User
+	var (
+		updatedAt sql.NullString
+		m         models.Users
+		u         models.User
+	)
 	rows, err := n.db.Query(`SELECT id, 
 	name, 
 	gender, 
@@ -96,10 +107,14 @@ func (n *User) Get() (*models.Users, error) {
 	login, 
 	password, 
 	bio, 
-	to_char(created_at, 'YYYY-MM-DD') as created_at 
+	to_char(created_at, 'YYYY-MM-DD') as created_at,
+	to_char(updated_at, 'YYYY-MM-DD') as updated_at 
 	FROM 
 	"user" `)
 	for rows.Next() {
+		if updatedAt.Valid {
+			u.UpdetadAt = "bu profilda yangilanish kiritilmagan"
+		}
 		err = rows.Scan(
 			&u.Id,
 			&u.Name,
@@ -109,29 +124,16 @@ func (n *User) Get() (*models.Users, error) {
 			&u.Login,
 			&u.Password,
 			&u.Bio,
-			&u.CreatedAt)
-		// Send users as JSON response using Fiber
-		// fmt.Println(u)
+			&u.CreatedAt,
+			&u.UpdetadAt)
+
 		if err != nil {
 			return nil, fmt.Errorf("Get dagi rowsni scan qilishda xatolik bor ekan xatolik: " + err.Error())
 		}
 
+		defer rows.Close()
 		m.Userc = append(m.Userc, u)
 	}
 	// fmt.Println(m.Userc)
 	return &m, nil
 }
-
-// func (n *Notification) Update(u *models.User) {
-
-// }
-
-// func (n *User) Delete(u *models.User) {
-// 	_, err := n.db.Exec(`DELETE FROM "user"
-// 	WHERE id= $1;
-// 	 `, u.Id)
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	fmt.Println("SUCCESS")
-// }
