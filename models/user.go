@@ -12,4 +12,6 @@ type User struct {
 	CreatedAt string `json:"created_at"`
 	UpdetadAt string `json:"updetad_at"`
 }
-
+type Users struct {
+	Userc []User `json:"users"`
+}
