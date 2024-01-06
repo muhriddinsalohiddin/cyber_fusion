@@ -107,30 +107,30 @@ func (r *List) GetPostlist() (*models.PostListResp, error) {
 
 	return &m, err
 }
-// func (r *List) GetPostByID(id string) (*models.Post, error) {
-// 	var post models.Post
-// 	query := `
-// 	SELECT
-// 		id,
-// 		user_id,
-// 		title,
-// 		body,
-// 		created_at
-// 	FROM "post"
-// 	WHERE id = $1
-// 	`
+func (r *List) GetByIdPost(id string) (*models.Post, error) {
+	var post models.Post
+	query := `
+	SELECT
+		id,
+		user_id,
+		title,
+		body,
+		created_at
+	FROM "post"
+	WHERE id = $1
+	`
 
-// 	err := r.db.QueryRow(query, id).Scan(
-// 		&post.Id,
-// 		&post.UserId,
-// 		&post.Title,
-// 		&post.Body,
-// 		&post.CreatedAt,
-// 	)
+	err := r.db.QueryRow(query, id).Scan(
+		&post.Id,
+		&post.UserId,
+		&post.Title,
+		&post.Body,
+		&post.CreatedAt,
+	)
 
-// 	if err != nil {
-// 		return nil, err
-// 	}
+	if err != nil {
+		return nil, err
+	}
 
-// 	return &post, nil
-// }
+	return &post, nil
+}

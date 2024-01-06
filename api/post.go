@@ -53,3 +53,11 @@ func (a *Api) GetPost(c *fiber.Ctx) error {
 	}
 	return handlerResponse(c, http.StatusOK, m)
 }
+func (a *Api) GetByIdPost(c *fiber.Ctx) error {
+	id := c.Params("id")
+	post, err := a.stg.List.GetByIdPost(id)
+	if err != nil {
+		return handlerResponse(c, http.StatusInternalServerError, err.Error())
+	}
+	return handlerResponse(c, http.StatusOK, post)
+}
