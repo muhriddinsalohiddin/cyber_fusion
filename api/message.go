@@ -49,6 +49,8 @@ func (a *Api) GetMessageList(c *fiber.Ctx) error {
 	var req = models.ListMessageReq{
 		SenderId:   c.Query("sender_id"),
 		ReceiverId: c.Query("receiver_id"),
+		FromDate: c.Query("from_date"),
+		ToDate: c.Query("to_date"),
 	}
 	m, err := a.stg.Message.GetMessageList(&req)
 	if err != nil {

@@ -75,7 +75,13 @@ func (r *Message) GetMessageList(req *models.ListMessageReq) (*models.ListMessag
 				"message"`
 		filter = " WHERE 1=1 "
 		args   []any
-	)
+	) 
+	if req.FromDate != "" && req.ToDate!=""{
+		args = append(args, req.FromDate)
+		filter += " AND created_at > $" + fmt.Sprint(len(args))
+		args = append(args, req.ToDate)
+		filter += " AND created_at < $" + fmt.Sprint(len(args))
+	}
 
 	if req.ReceiverId != "" {
 		args = append(args, req.ReceiverId)
