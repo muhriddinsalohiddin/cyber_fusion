@@ -6,6 +6,7 @@ type Message struct {
 	ReceiverId string `json:"receiver_id"`
 	Body       string `json:"body"`
 	CreatedAt  string `json:"created_at"`
+	UpdatedAt  string `json:"updated_at"`
 }
 
 type ListMessage struct {

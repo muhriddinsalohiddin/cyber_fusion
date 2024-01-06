@@ -37,7 +37,8 @@ func (r *Message) Update(m *models.Message, id *string) error {
 	UPDATE 
 		"message"
 	SET
-		body=$2
+		body=$2,
+		updated_at = NOW()
 	WHERE
 		id=$1
 	`, id, m.Body)
@@ -70,7 +71,7 @@ func (r *Message) GetMessageList(req *models.ListMessageReq) (*models.ListMessag
 		m     models.ListMessage
 		query = `
 			SELECT
-				id,sender_id,receiver_id,body,created_at 
+				id,sender_id,receiver_id,body,created_at,updated_at 
 			FROM
 				"message"`
 		filter = " WHERE 1=1 "
@@ -99,16 +100,23 @@ func (r *Message) GetMessageList(req *models.ListMessageReq) (*models.ListMessag
 	}
 	defer rows.Close()
 	for rows.Next() {
-		var message models.Message
+		var (
+			message models.Message
+			updated sql.NullString
+		)
 		err = rows.Scan(
 			&message.Id,
 			&message.SenderId,
 			&message.ReceiverId,
 			&message.Body,
 			&message.CreatedAt,
+			&updated,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("Okaxon GetMessageListdagi FORdagi Scan sal xato ishlayabdi " + err.Error())
+		}
+		if updated.Valid{
+			message.UpdatedAt = updated.String
 		}
 		m.Messages = append(m.Messages, &message)
 	}
@@ -119,10 +127,13 @@ func (r *Message) GetMessageList(req *models.ListMessageReq) (*models.ListMessag
 }
 
 func (r *Message) GetMessage(id *string) (*models.Message, error) {
-	var m models.Message
+	var (
+		m models.Message
+		updated sql.NullString
+	)
 	err := r.db.QueryRow(`
 	SELECT 
-		id,sender_id,receiver_id,body,created_at
+		id,sender_id,receiver_id,body,created_at,updated_at
 	FROM
 		"message"
 	WHERE
@@ -133,9 +144,13 @@ func (r *Message) GetMessage(id *string) (*models.Message, error) {
 		&m.ReceiverId,
 		&m.Body,
 		&m.CreatedAt,
+		&updated,
 	)
+	if updated.Valid{
+		m.UpdatedAt = updated.String
+	}
 	if err != nil {
-		return nil, fmt.Errorf("Message Update funcsiyada xato bor akaxon" + err.Error())
+		return nil, fmt.Errorf("Message Get funcsiyada xato bor akaxon" + err.Error())
 	}
 	return &m, nil
 }
