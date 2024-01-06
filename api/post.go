@@ -17,7 +17,7 @@ func (a *Api) CreatePost(c *fiber.Ctx) error {
 	if err != nil {
 		return handlerResponse(c, http.StatusInternalServerError, err.Error())
 	}
-	return handlerResponse(c, http.StatusCreated, "SUCCESS")
+	return handlerResponse(c, http.StatusCreated, "SUCCESS CREATED")
 }
 
 func (a *Api) UpdatePost(c *fiber.Ctx) error {

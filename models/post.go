@@ -12,4 +12,3 @@ type PostListResp struct {
 	Post  []*Post `json:"post"`
 	Count int     `json:"count"`
 }
-type PostListReq struct{}

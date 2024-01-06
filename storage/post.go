@@ -43,7 +43,7 @@ func (r *Post) Delete(m *models.Post) error {
 		id=$1
 	`, m.Id)
 	if err != nil {
-		return fmt.Errorf("Post Delete funcsiyada xato bor akaxon" + err.Error())
+		return fmt.Errorf("PDF xato" + err.Error())
 	}
 	return nil
 }
@@ -60,7 +60,7 @@ func (r *Post) Update(n *models.Post) error {
 		id=$1
 	`, n.Id, n.Body, n.Title)
 	if err != nil {
-		return fmt.Errorf("Post Update funksiya xato " + err.Error())
+		return fmt.Errorf("PUF xato " + err.Error())
 	}
 	return nil
 }
@@ -107,3 +107,30 @@ func (r *List) GetPostlist() (*models.PostListResp, error) {
 
 	return &m, err
 }
+// func (r *List) GetPostByID(id string) (*models.Post, error) {
+// 	var post models.Post
+// 	query := `
+// 	SELECT
+// 		id,
+// 		user_id,
+// 		title,
+// 		body,
+// 		created_at
+// 	FROM "post"
+// 	WHERE id = $1
+// 	`
+
+// 	err := r.db.QueryRow(query, id).Scan(
+// 		&post.Id,
+// 		&post.UserId,
+// 		&post.Title,
+// 		&post.Body,
+// 		&post.CreatedAt,
+// 	)
+
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// 	return &post, nil
+// }
