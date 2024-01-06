@@ -54,7 +54,7 @@ func (r *Post) Update(n *models.Post) error {
 		"post"
 	SET
 		body=$2,
-		title=$3
+		title=$3,
 		updated_at = NOW()
 	WHERE
 		id=$1
