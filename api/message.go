@@ -14,8 +14,6 @@ func (a *Api) CreateMessage(c *fiber.Ctx) error {
 		return handlerResponse(c, http.StatusBadRequest, "body parcerda xatolik Create: "+err.Error())
 	}
 
-	defer a.stg.Close()
-
 	err = a.stg.Message.Create(&m)
 	if err != nil {
 		return handlerResponse(c, http.StatusInternalServerError, err.Error())
@@ -30,7 +28,7 @@ func (a *Api) UpdateMessage(c *fiber.Ctx) error {
 		return handlerResponse(c, http.StatusBadRequest, "body parcerda xatolik Updatedagi: "+err.Error())
 	}
 	id := c.Params("id")
-	err = a.stg.Message.Update(&m,&id)
+	err = a.stg.Message.Update(&m, &id)
 	if err != nil {
 		return handlerResponse(c, http.StatusInternalServerError, err.Error())
 	}
@@ -48,8 +46,11 @@ func (a *Api) DeleteMessage(c *fiber.Ctx) error {
 }
 
 func (a *Api) GetMessageList(c *fiber.Ctx) error {
-	var m models.List
-	err := a.stg.Message.GetMessageList(&m)
+	var req = models.ListMessageReq{
+		SenderId:   c.Query("sender_id"),
+		ReceiverId: c.Query("receiver_id"),
+	}
+	m, err := a.stg.Message.GetMessageList(&req)
 	if err != nil {
 		return handlerResponse(c, http.StatusInternalServerError, err.Error())
 	}
@@ -57,12 +58,10 @@ func (a *Api) GetMessageList(c *fiber.Ctx) error {
 }
 
 func (a *Api) GetMessageById(c *fiber.Ctx) error {
-	var m models.Message
 	id := c.Params("id")
-	err := a.stg.Message.GetMessage(&m, &id)
+	m, err := a.stg.Message.GetMessage(&id)
 	if err != nil {
 		return handlerResponse(c, http.StatusInternalServerError, err.Error())
 	}
-
-	return handlerResponse(c, http.StatusAccepted,m)
+	return handlerResponse(c, http.StatusAccepted, m)
 }

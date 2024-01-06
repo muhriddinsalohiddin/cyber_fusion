@@ -8,7 +8,13 @@ type Message struct {
 	CreatedAt  string `json:"created_at"`
 }
 
-type List struct {
+type ListMessage struct {
 	Messages []*Message `json:"messages"`
 	Cout     int        `json:"count"`
+}
+type ListMessageReq struct {
+	SenderId   string
+	ReceiverId string
+	FromDate   string
+	ToDate     string
 }

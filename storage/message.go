@@ -49,7 +49,7 @@ func (r *Message) Update(m *models.Message, id *string) error {
 }
 
 func (r *Message) Delete(id *string) error {
-	_, err := r.db.Exec(`
+	res, err := r.db.Exec(`
 	DELETE FROM 
 		"message"
 	WHERE
@@ -58,20 +58,40 @@ func (r *Message) Delete(id *string) error {
 	if err != nil {
 		return fmt.Errorf("Message Delete funcsiyada xato bor akaxon" + err.Error())
 	}
-	return nil
+	i, err := res.RowsAffected()
+	if i == 0 {
+		return sql.ErrNoRows
+	}
+	return err
 }
 
-func (r *Message) GetMessageList(m *models.List) error {
-	query := `
-		SELECT
-			id,sender_id,receiver_id,body,created_at 
-		FROM
-			"message"
-	`
-	rows, err := r.db.Query(query)
-	if err != nil {
-		return fmt.Errorf("Okaxon GetMessageListdagi quericha sal xato ishlayabdi " + err.Error())
+func (r *Message) GetMessageList(req *models.ListMessageReq) (*models.ListMessage, error) {
+	var (
+		m     models.ListMessage
+		query = `
+			SELECT
+				id,sender_id,receiver_id,body,created_at 
+			FROM
+				"message"`
+		filter = " WHERE 1=1 "
+		args   []any
+	)
+
+	if req.ReceiverId != "" {
+		args = append(args, req.ReceiverId)
+		filter += " AND receiver_id = $" + fmt.Sprint(len(args))
 	}
+
+	if req.SenderId != "" {
+		args = append(args, req.SenderId)
+		filter += " AND sender_id = $" + fmt.Sprint(len(args))
+	}
+	query = query + filter
+	rows, err := r.db.Query(query, args...)
+	if err != nil {
+		return nil, fmt.Errorf("Okaxon GetMessageListdagi quericha sal xato ishlayabdi " + err.Error())
+	}
+	defer rows.Close()
 	for rows.Next() {
 		var message models.Message
 		err = rows.Scan(
@@ -82,17 +102,18 @@ func (r *Message) GetMessageList(m *models.List) error {
 			&message.CreatedAt,
 		)
 		if err != nil {
-			return fmt.Errorf("Okaxon GetMessageListdagi FORdagi Scan sal xato ishlayabdi " + err.Error())
+			return nil, fmt.Errorf("Okaxon GetMessageListdagi FORdagi Scan sal xato ishlayabdi " + err.Error())
 		}
 		m.Messages = append(m.Messages, &message)
 	}
 
-	err = r.db.QueryRow(`SELECT COUNT(1) FROM "message"`).Scan(&m.Cout)
+	err = r.db.QueryRow(`SELECT COUNT(1) FROM "message"`+filter, args...).Scan(&m.Cout)
 
-	return err
+	return &m, err
 }
 
-func (r *Message) GetMessage(m *models.Message, id *string) error {
+func (r *Message) GetMessage(id *string) (*models.Message, error) {
+	var m models.Message
 	err := r.db.QueryRow(`
 	SELECT 
 		id,sender_id,receiver_id,body,created_at
@@ -108,7 +129,7 @@ func (r *Message) GetMessage(m *models.Message, id *string) error {
 		&m.CreatedAt,
 	)
 	if err != nil {
-		return fmt.Errorf("Message Update funcsiyada xato bor akaxon" + err.Error())
+		return nil, fmt.Errorf("Message Update funcsiyada xato bor akaxon" + err.Error())
 	}
-	return nil
+	return &m, nil
 }
