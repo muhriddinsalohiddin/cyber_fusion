@@ -49,11 +49,11 @@ func (c *Comment) Update(n *models.Comment, id *string) error {
 	if err != nil {
 		return fmt.Errorf("Comment Update qilishda xato" + err.Error())
 	}
-	
+
 	return nil
 }
-func (c *Comment) DeleteComment( id *string)  error {
-	_, err := c.db.Exec(
+func (c *Comment) DeleteComment(id *string) error {
+	res, err := c.db.Exec(
 		`
 		DELETE FROM
 			"comment"
@@ -61,14 +61,20 @@ func (c *Comment) DeleteComment( id *string)  error {
 			id=$1
 		`, id)
 	if err != nil {
-		return fmt.Errorf("Comment Update qilishda xato" + err.Error())
+		return fmt.Errorf("Comment delete qilishda xato" + err.Error())
+	}
+
+	i, err := res.RowsAffected()
+	if err != nil || i == 0 {
+		return sql.ErrNoRows
 	}
 	
 	return nil
 }
 func (r *Comment) Getlist(req *models.Comment) (*models.Listcha, error) {
-	var( m models.Listcha
-	query = `
+	var (
+		m     models.Listcha
+		query = `
 	SELECT
 		id,
 		user_id,
@@ -77,14 +83,15 @@ func (r *Comment) Getlist(req *models.Comment) (*models.Listcha, error) {
 		created_at,
 		updated_at
 	FROM "comment"`
-    filter=" Where 1=1 "
-    args  []any)
-	if req.UserId !=""{
-		args=append(args,req.UserId )
-		filter +=" AND user_id=$"+fmt.Sprint(len(args))
+		filter = " Where 1=1 "
+		args   []any
+	)
+	if req.UserId != "" {
+		args = append(args, req.UserId)
+		filter += " AND user_id=$" + fmt.Sprint(len(args))
 	}
-	query=query+filter
-	rows, err := r.db.Query(query,args...)
+	query = query + filter
+	rows, err := r.db.Query(query, args...)
 	if err != nil {
 		return nil, fmt.Errorf("queryda " + err.Error())
 	}
@@ -97,7 +104,7 @@ func (r *Comment) Getlist(req *models.Comment) (*models.Listcha, error) {
 
 	for rows.Next() {
 		var (
-			c models.Comment
+			c       models.Comment
 			updated sql.NullString
 		)
 		err = rows.Scan(

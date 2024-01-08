@@ -2,6 +2,7 @@ package api
 
 import (
 	"app/models"
+	"fmt"
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
@@ -40,7 +41,7 @@ func (a *Api) UpdateComment(c *fiber.Ctx) error {
 		return handlerResponse(c, http.StatusBadRequest, "body parcerda xatolik Updatedagi: "+err.Error())
 	}
 	id := c.Params("id")
-	err = a.stg.Comment.Update(&m,&id)
+	err = a.stg.Comment.Update(&m, &id)
 	if err != nil {
 		return handlerResponse(c, http.StatusInternalServerError, err.Error())
 	}
@@ -49,8 +50,11 @@ func (a *Api) UpdateComment(c *fiber.Ctx) error {
 
 func (a *Api) DeleteComment(c *fiber.Ctx) error {
 	id := c.Params("id")
-	 a.stg.Comment.DeleteComment(&id)
-	
+	err := a.stg.Comment.DeleteComment(&id)
+
+	if err != nil {
+		fmt.Println("DeleteComment funksiyasida xato: ", err.Error())
+	}
 
 	return handlerResponse(c, http.StatusAccepted, "SUCCESS, DELETED")
 }
