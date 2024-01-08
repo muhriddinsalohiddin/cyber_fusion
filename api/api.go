@@ -3,6 +3,7 @@ package api
 import (
 	"app/config"
 	"app/storage"
+
 	//"database/sql"
 
 	"github.com/gofiber/fiber/v2"
@@ -11,7 +12,6 @@ import (
 type Api struct {
 	f   *fiber.App
 	stg *storage.Storage
-	//db *sql.DB
 }
 
 func NewApi(stg *storage.Storage) *Api {
@@ -29,22 +29,42 @@ func NewApi(stg *storage.Storage) *Api {
 	{
 		u := f.Group("user")
 		u.Post("/", a.CreateUser)
-		// u.Get("/", a.GetUser)
-		// u.Get("/:id", a.GetByIdUser)
-		// u.Put("/", a.UpdateUser)
-		// u.Delete("/", a.DeleteUser)
+		u.Get("/", a.GetUser)
+		u.Get("/:id", a.GetByIdUser)
+		u.Put("/:id", a.UpdateUser)
+		u.Delete("/:id", a.DeleteUser)
+
 	}
 	{
-		u:=f.Group("notification")
-		u.Post("/",a.CreateNotification)
-		u.Get("/",a.GetnotificationList)
-		u.Delete("/:id",a.DeleteNotification)
-		u.Put("/:id",a.UpdateNotification)
+		b := f.Group("author")
+		b.Post("/", a.CreateAuthor)
+		b.Put("/:id", a.UpdateAuthor)
+		b.Get("/", a.GetAuthorList)
+		b.Delete("/", a.DeleteAuthor)
+	}
+
+	{
+		u := f.Group("post")
+		u.Post("/", a.CreatePost)
+		u.Delete("/", a.DeletePost)
+		u.Put("/", a.UpdatePost)
+		u.Get("/", a.GetPost)
+		u.Get("/:id", a.GetByIdPost)
+
+	}
+	{
+		u := f.Group("notification")
+		u.Post("/", a.CreateNotification)
+		u.Get("/", a.GetnotificationList)
+		u.Delete("/:id", a.DeleteNotification)
+		u.Put("/:id", a.UpdateNotification)
 	}
 
 	return a
 }
 
 func (a *Api) Run() {
-	a.f.Listen(config.Port)
+	if err := a.f.Listen(config.Port); err != nil {
+		panic(err)
+	}
 }

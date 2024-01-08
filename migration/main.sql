@@ -5,6 +5,7 @@ CREATE TABLE "user" (
     gender BOOLEAN NOT NULL,
     birthday DATE NOT NULL,
     email TEXT NOT NULL,
+    login TEXT NOT NULL,
     password TEXT NOT NULL,
     bio TEXT,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -56,6 +57,13 @@ CREATE TABLE "message" (
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Alibek
+CREATE TABLE "author" (
+    id UUID PRIMARY KEY,
+    name TEXT NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP
+); 
 -- Umar
 CREATE TABLE "book" (
     id UUID PRIMARY KEY,

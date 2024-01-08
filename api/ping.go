@@ -3,7 +3,7 @@ package api
 import "github.com/gofiber/fiber/v2"
 
 func Ping(c *fiber.Ctx) error {
-	return c.JSON("pong")
+	return c.JSON("salom")
 }
 
 func PostPing(c *fiber.Ctx) error {
@@ -11,6 +11,5 @@ func PostPing(c *fiber.Ctx) error {
 }
 
 func handlerResponse(c *fiber.Ctx, code int, response any) error {
-	c.SendStatus(code)
 	return c.JSON(response)
 }
