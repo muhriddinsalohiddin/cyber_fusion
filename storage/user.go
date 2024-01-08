@@ -97,7 +97,6 @@ func (n *User) Get() (*models.Users, error) {
 	var (
 		updatedAt sql.NullString
 		m         models.Users
-		u         models.User
 	)
 	rows, err := n.db.Query(`SELECT id, 
 	name, 
@@ -111,10 +110,14 @@ func (n *User) Get() (*models.Users, error) {
 	to_char(updated_at, 'YYYY-MM-DD') as updated_at 
 	FROM 
 	"user" `)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
 	for rows.Next() {
-		if updatedAt.Valid {
-			u.UpdetadAt = "bu profilda yangilanish kiritilmagan"
-		}
+		var u models.User
+
 		err = rows.Scan(
 			&u.Id,
 			&u.Name,
@@ -125,15 +128,20 @@ func (n *User) Get() (*models.Users, error) {
 			&u.Password,
 			&u.Bio,
 			&u.CreatedAt,
-			&u.UpdetadAt)
-
+			&updatedAt,
+		)
 		if err != nil {
 			return nil, fmt.Errorf("Get dagi rowsni scan qilishda xatolik bor ekan xatolik: " + err.Error())
 		}
 
-		defer rows.Close()
-		m.Userc = append(m.Userc, u)
+		if updatedAt.Valid {
+			u.UpdetadAt = updatedAt.String
+		} else {
+			u.UpdetadAt = "bu profilda yangilanish kiritilmagan"
+		}
+
+		m.Users = append(m.Users, &u)
 	}
-	// fmt.Println(m.Userc)
+
 	return &m, nil
 }

@@ -13,5 +13,5 @@ type User struct {
 	UpdetadAt string `json:"updetad_at"`
 }
 type Users struct {
-	Userc []User `json:"users"`
+	Users []*User `json:"users"`
 }

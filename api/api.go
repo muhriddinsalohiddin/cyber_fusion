@@ -60,6 +60,7 @@ func NewApi(stg *storage.Storage) *Api {
 		u.Delete("/", a.DeletePost)
 		u.Put("/", a.UpdatePost)
 		u.Get("/", a.GetPost)
+		u.Get("/:id", a.GetByIdPost)
 
 	}
 
