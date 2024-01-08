@@ -57,6 +57,13 @@ CREATE TABLE "message" (
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Alibek
+CREATE TABLE "author" (
+    id UUID PRIMARY KEY,
+    name TEXT NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP
+); 
 -- Umar
 CREATE TABLE "book" (
     id UUID PRIMARY KEY,
@@ -66,12 +73,3 @@ CREATE TABLE "book" (
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP
 );
-
--- Alibek
-CREATE TABLE "author" (
-    id UUID PRIMARY KEY,
-    name TEXT NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP
-); 
-
