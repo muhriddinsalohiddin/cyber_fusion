@@ -9,7 +9,7 @@ type Comment struct {
 	CreatedAt string `json:"created_at"`
 	UpdatedAt string `json:"updated_at"`
 }
-type List struct {
+type Listcha struct {
 	Comments []*Comment `json:"comment"`
 	Count    int        `json:"count"`
 }

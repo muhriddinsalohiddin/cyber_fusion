@@ -66,8 +66,8 @@ func (c *Comment) DeleteComment( id *string)  error {
 	
 	return nil
 }
-func (r *Comment) Getlist(req *models.Comment) (*models.List, error) {
-	var( m models.List
+func (r *Comment) Getlist(req *models.Comment) (*models.Listcha, error) {
+	var( m models.Listcha
 	query = `
 	SELECT
 		id,
