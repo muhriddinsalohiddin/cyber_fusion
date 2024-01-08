@@ -26,16 +26,24 @@ func NewApi(stg *storage.Storage) *Api {
 	f.Post("/ping", PostPing)
 
 	// user route
-	{
-		u := f.Group("user")
-		u.Post("/", a.CreateUser)
-		// u.Get("/", a.GetUser)
-		// u.Get("/:id", a.GetByIdUser)
-		// u.Put("/", a.UpdateUser)
-		// u.Delete("/", a.DeleteUser)
-	}
+	// {
+	// 	u := f.Group("user")
+	// 	u.Post("/", a.CreateUser)
+	// 	// u.Get("/", a.GetUser)
+	// 	//  u.Get("/:id", a.GetByIdUser)
+	// 	//  u.Put("/", a.UpdateUser)
+	// 	//  u.Delete("/", a.DeleteUser)
+	// }
 
+	{
+		c := f.Group("comments")
+		c.Post("/", a.CreateComment)
+		c.Get("/", a.GetCommentlist)
+		 c.Delete("/:id", a.DeleteComment)
+		c.Put("/id", a.UpdateComment)
+	}
 	return a
+
 }
 
 func (a *Api) Run() {

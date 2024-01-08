@@ -73,3 +73,12 @@ CREATE TABLE "author" (
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP
 ); 
+INSERT INTO "post" (id, user_id, title, body, created_at, updated_at)
+VALUES
+    ('72864b4a-a657-44ef-abc3-a559b723da5f', '4e2ff5de-8bcb-4098-95f7-8ce14671b901', 'First Post', 'This is the body of the first post.', '2024-01-08 14:00:00', NULL),
+    ('e98e22db-bd66-4ea8-bd93-a67392efcc03', '4e2ff5de-8bcb-4098-95f7-8ce14671b901', 'Second Post', 'This is the body of the second post.', '2024-01-08 15:30:00', NULL);
+        
+INSERT INTO "comment" (id, user_id, post_id, body, created_at, updated_at)
+VALUES
+    ('516d6102-ca06-4282-a40e-b82dc976ab55', '4e2ff5de-8bcb-4098-95f7-8ce14671b901', '72864b4a-a657-44ef-abc3-a559b723da5f', 'Great post! Thanks for sharing.', '2024-01-08 16:00:00', NULL),
+    ('0b455e83-73dc-4577-ad01-0162059c4f2c', '4e2ff5de-8bcb-4098-95f7-8ce14671b901', '72864b4a-a657-44ef-abc3-a559b723da5f', 'I enjoyed reading this. Well done!', '2024-01-08 17:30:00', NULL);
