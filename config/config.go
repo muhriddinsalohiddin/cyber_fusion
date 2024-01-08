@@ -8,6 +8,7 @@ const (
 	user     = "postgres"
 	password = "1"
 	db       = "instagram"
+
 )
 
 var (
