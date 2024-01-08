@@ -7,28 +7,36 @@ import (
 )
 
 type Storage struct {
-	db   *sql.DB
-	User *User
-	Books *Books
-	// BooksList *BooksList
+	db           *sql.DB
+	User         *User
+	Books        *Books
+	Comment      *Comment
+	Message      *Message
+	Notification *Notification
+	Author       *Author
+	Post         *Post
 }
 
 func NewStorage(connStr string) *Storage {
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
-		panic(err)
+		return nil
 	}
 
 	err = db.Ping()
 	if err != nil {
-		panic(err)
+		return nil
 	}
 
 	return &Storage{
-		db:   db,
-		User: NewUser(db),
-		Books : NewBooks(db),
-		// BooksList: NewBooksList(db),
+		db:           db,
+		User:         NewUser(db),
+		Books:        NewBooks(db),
+		Comment:      NewComment(db),
+		Message:      NewMessage(db),
+		Notification: NewNotification(db),
+		Author:       NewAuthor(db),
+		Post:         NewPost(db),
 	}
 }
 
