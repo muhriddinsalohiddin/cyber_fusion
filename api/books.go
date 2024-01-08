@@ -24,10 +24,9 @@ func (a *Api) CreateBook(c *fiber.Ctx) error {
 func (a *Api) GetBook(c *fiber.Ctx) error {
 	b, err := a.stg.Books.GetList(models.LsitBookReq{
 		Author: c.Query("author"),
-		Title: c.Query("title"),
-		
+		Title:  c.Query("title"),
 	})
-	if  err != nil {
+	if err != nil {
 		return handlerResponse(c, http.StatusBadRequest, "GetBook parcerda xatolik: "+err.Error())
 	}
 	return handlerResponse(c, http.StatusOK, b)
@@ -49,13 +48,16 @@ func (a *Api) UpdateBook(c *fiber.Ctx) error {
 	id := c.Params("id")
 	err = a.stg.Books.UpdateBook(&b, &id)
 	if err != nil {
-		 return handlerResponse(c, http.StatusBadRequest, "Update parcerda xatolik: "+err.Error())
+		return handlerResponse(c, http.StatusBadRequest, "Update parcerda xatolik: "+err.Error())
 	}
 	return handlerResponse(c, http.StatusOK, "Updated")
 }
 
 func (a *Api) DeleteBook(c *fiber.Ctx) error {
 	id := c.Params("id")
-	a.stg.Books.DeleteBook(&id)
-	return handlerResponse(c, http.StatusOK, nil)
+	err := a.stg.Books.DeleteBook(&id)
+	if err != nil {
+		return handlerResponse(c, http.StatusBadRequest, "Delete parcerda xatolik: "+err.Error())
+	}
+	return handlerResponse(c, http.StatusNoContent, nil)
 }
