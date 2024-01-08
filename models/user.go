@@ -12,6 +12,14 @@ type User struct {
 	CreatedAt string `json:"created_at"`
 	UpdetadAt string `json:"updetad_at"`
 }
+
 type Users struct {
 	Users []*User `json:"users"`
+}
+
+type UserReq struct {
+	Limit    int    `json:"limit"`
+	Offset   int    `json:"offset"`
+	FromDate string `json:"from_date"`
+	ToDate   string `json:"to_date"`
 }

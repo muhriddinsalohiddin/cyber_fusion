@@ -25,7 +25,7 @@ func NewStorage(connStr string) *Storage {
 
 	err = db.Ping()
 	if err != nil {
-		return nil
+		panic(err)
 	}
 
 	return &Storage{

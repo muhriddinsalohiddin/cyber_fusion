@@ -76,7 +76,7 @@ func (r *Books) GetList(req models.LsitBookReq) (*models.BooksList, error) {
 	for rows.Next() {
 		var (
 			updated sql.NullString
-			b      models.Books
+			b       models.Books
 		)
 
 		err = rows.Scan(
@@ -88,11 +88,11 @@ func (r *Books) GetList(req models.LsitBookReq) (*models.BooksList, error) {
 			&updated,
 		)
 		if err != nil {
-			return nil,  fmt.Errorf("Dear Friend in getList for scan don't word" + err.Error())
+			return nil, fmt.Errorf("Dear Friend in getList for scan don't word" + err.Error())
 		}
-		bs.Books =append(bs.Books, &b)
+		bs.Books = append(bs.Books, &b)
 	}
-	err = r.db.QueryRow(`Select Count(1) from "book"` + filter, args...).Scan(&bs.Count)
+	err = r.db.QueryRow(`Select Count(1) from "book"`+filter, args...).Scan(&bs.Count)
 	return &bs, err
 }
 
@@ -109,7 +109,7 @@ title = $2,
 		b.Description,
 	)
 	if err != nil {
-		return  fmt.Errorf("Updated at da parcerda xatolik: "+err.Error())
+		return fmt.Errorf("Updated at da parcerda xatolik: " + err.Error())
 	}
 	return nil
 }
@@ -140,7 +140,7 @@ func (r *Books) GetBookById(b *models.Books, id *string) error {
 		&b.CreatedAt,
 	)
 	if err != nil {
-		return fmt.Errorf("In GetBookById function don't work")
+		return fmt.Errorf("in GetBookById function don't work")
 	}
 	return nil
 }

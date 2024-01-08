@@ -91,26 +91,47 @@ func (n *User) GetById(id string) (*models.User, error) {
 	return &u, err
 
 }
-func (n *User) Get() (*models.Users, error) {
+func (n *User) Get(req *models.UserReq) (*models.Users, error) {
 	var (
 		updatedAt sql.NullString
 		m         models.Users
+		filter    = "WHERE true"
+		arr       []any
 	)
-	rows, err := n.db.Query(`SELECT id, 
-	name, 
-	gender, 
-	birthday, 
-	email, 
-	login, 
-	password, 
-	bio, 
-	to_char(created_at, 'YYYY-MM-DD') as created_at,
-	to_char(updated_at, 'YYYY-MM-DD') as updated_at 
-	FROM 
-	"user" `)
+
+	if req.FromDate != "" && req.ToDate != "" {
+		arr = append(arr, req.FromDate, req.ToDate)
+		filter += fmt.Sprintf(" AND created_at BETWEEN $%d AND $%d", len(arr)-1, len(arr))
+	}
+
+	if req.Limit != 0 {
+		arr = append(arr, req.Limit)
+		filter += " LIMIT $" + fmt.Sprint(len(arr))
+	}
+
+	if req.Offset != 0 {
+		arr = append(arr, req.Offset)
+		filter += " OFFSET $" + fmt.Sprint(len(arr))
+	}
+
+	query := `
+	SELECT id, 
+		name, 
+		gender, 
+		birthday, 
+		email, 
+		login, 
+		password, 
+		bio, 
+		to_char(created_at, 'YYYY-MM-DD') as created_at,
+		to_char(updated_at, 'YYYY-MM-DD') as updated_at 
+	FROM "user" ` + filter
+	fmt.Println("query", query, arr)
+	rows, err := n.db.Query(query, arr...)
 	if err != nil {
 		return nil, err
 	}
+
 	defer rows.Close()
 
 	for rows.Next() {
