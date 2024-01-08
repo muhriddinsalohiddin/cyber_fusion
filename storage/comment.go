@@ -36,42 +36,34 @@ func (c *Comment) Create(n *models.Comment) error {
 	}
 	return nil
 }
-func (c *Comment) Update(n *models.Comment, id string) error {
-	res, err := c.db.Exec(
+func (c *Comment) Update(n *models.Comment, id *string) error {
+	_, err := c.db.Exec(
 		`
 		UPDATE
 			"comment"
 		SET 
 			body=$2
-		WHERE
-			post_id=$1	
+			WHERE
+			id=$1	
 			`, id, n.Body)
 	if err != nil {
 		return fmt.Errorf("Comment Update qilishda xato" + err.Error())
 	}
-	if rowsAffected, err := res.RowsAffected(); err != nil {
-		return fmt.Errorf("Comment Update funksiyasida xato (RowsAffected): %v", err)
-	} else if rowsAffected == 0 {
-		return fmt.Errorf("bunday id topilmadi:" + err.Error())
-	}
+	
 	return nil
 }
-func (c *Comment) DeleteComment(n *models.Comment) error {
-	res, err := c.db.Exec(
+func (c *Comment) DeleteComment( id *string)  error {
+	_, err := c.db.Exec(
 		`
 		DELETE FROM
 			"comment"
 		WHERE 
-			post_id=$1
-		`, n.PostId)
+			id=$1
+		`, id)
 	if err != nil {
 		return fmt.Errorf("Comment Update qilishda xato" + err.Error())
 	}
-	if rowsAffected, err := res.RowsAffected(); err != nil {
-		return fmt.Errorf("COmment Delete funksiyasida xato (RowsAffected): %v", err)
-	} else if rowsAffected == 0 {
-		return fmt.Errorf("bunday id  topilmadi:" + err.Error())
-	}
+	
 	return nil
 }
 func (r *Comment) Getlist(req *models.Comment) (*models.List, error) {

@@ -39,8 +39,8 @@ func NewApi(stg *storage.Storage) *Api {
 		c := f.Group("comments")
 		c.Post("/", a.CreateComment)
 		c.Get("/", a.GetCommentlist)
-		 c.Delete("/:id", a.DeleteComment)
-		c.Put("/id", a.UpdateComment)
+		c.Delete("/:id", a.DeleteComment)
+		c.Put("/:id", a.UpdateComment)
 	}
 	return a
 
