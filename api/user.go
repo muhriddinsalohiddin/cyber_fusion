@@ -22,8 +22,8 @@ func (a *Api) CreateUser(c *fiber.Ctx) error {
 }
 
 func (a *Api) GetByIdUser(c *fiber.Ctx) error {
-	// id := c.Params("id")
-	user, err := a.stg.User.Get()
+	id := c.Params("id")
+	user, err := a.stg.User.GetById(id)
 	if err != nil {
 		return err
 	}
