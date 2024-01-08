@@ -7,7 +7,8 @@ const (
 	pPort    = "5432"
 	user     = "postgres"
 	password = "1"
-	db       = "postgres"
+	db       = "instagram"
+
 )
 
 var (

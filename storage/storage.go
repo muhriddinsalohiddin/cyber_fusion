@@ -10,7 +10,7 @@ type Storage struct {
 	db         *sql.DB
 	User       *User
 	Author     *Author
-
+	Post *Post
 }
 
 func NewStorage(connStr string) *Storage {
@@ -28,6 +28,7 @@ func NewStorage(connStr string) *Storage {
 		db:         db,
 		User:       NewUser(db),
 		Author:     NewAuthor(db),
+		Post:       NewPost(db),
 	}
 }
 

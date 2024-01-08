@@ -54,6 +54,15 @@ func NewApi(stg *storage.Storage) *Api {
 		b.Delete("/", a.DeleteAuthor)
 	}
 
+	{
+		u := f.Group("post")
+		u.Post("/", a.CreatePost)
+		u.Delete("/",a.DeletePost)
+		u.Put("/",a.UpdatePost)
+		u.Get("/",a.GetPost)
+
+	}
+
 	return a
 }
 
