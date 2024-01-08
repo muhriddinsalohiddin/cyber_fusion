@@ -1,5 +1,5 @@
 -- farrux
-CREATE TABLE "user" (
+CREATE TABLE IF NOT EXISTS "user" (
     id UUID PRIMARY KEY,
     name TEXT NOT NULL,
     gender BOOLEAN NOT NULL,
@@ -14,7 +14,7 @@ CREATE TABLE "user" (
 
 
 -- Saidakbar
-CREATE TABLE "post" (
+CREATE TABLE IF NOT EXISTS "post" (
     id UUID PRIMARY KEY,
     user_id UUID NOT NULL REFERENCES "user" (id),
     title TEXT NOT NULL,
@@ -23,7 +23,7 @@ CREATE TABLE "post" (
     updated_at TIMESTAMP
 );
 -- Said
-CREATE TABLE "comment" (
+CREATE TABLE IF NOT EXISTS "comment" (
     id UUID PRIMARY KEY,
     user_id UUID NOT NULL REFERENCES "user" (id),
     post_id UUID NOT NULL REFERENCES "post" (id),
@@ -33,7 +33,7 @@ CREATE TABLE "comment" (
 );
 
 -- Lazizbek
-CREATE TABLE "like" (
+CREATE TABLE IF NOT EXISTS "like" (
     id UUID PRIMARY KEY,
     user_id UUID NOT NULL REFERENCES "user" (id),
     post_id UUID NOT NULL REFERENCES "post" (id),
@@ -41,7 +41,7 @@ CREATE TABLE "like" (
 );
 
 -- Asror
-CREATE TABLE "notification" (
+CREATE TABLE IF NOT EXISTS "notification" (
     id UUID PRIMARY KEY,
     user_id UUID NOT NULL REFERENCES "user" (id),
     type TEXT NOT NULL,
@@ -50,23 +50,24 @@ CREATE TABLE "notification" (
 );
 
 -- MuhammadYusuf
-CREATE TABLE "message" (
+CREATE TABLE IF NOT EXISTS "message" (
     id UUID PRIMARY KEY,
     sender_id UUID NOT NULL REFERENCES "user" (id),
     receiver_id UUID NOT NULL REFERENCES "user" (id),
     body TEXT NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP
 );
 
 -- Alibek
-CREATE TABLE "author" (
+CREATE TABLE IF NOT EXISTS "author" (
     id UUID PRIMARY KEY,
     name TEXT NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP
 ); 
 -- Umar
-CREATE TABLE "book" (
+CREATE TABLE IF NOT EXISTS "book" (
     id UUID PRIMARY KEY,
     title TEXT NOT NULL,
     author UUID NOT NULL REFERENCES "author" (id),
@@ -75,12 +76,58 @@ CREATE TABLE "book" (
     updated_at TIMESTAMP
 );
 
--- Alibek
-CREATE TABLE "author" (
-    id UUID PRIMARY KEY,
-    name TEXT NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP
-); 
+-- create extension
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
-UPDATE "book" set  title = &2, author = &3, description = &4  where id = %1;
+-- generate uuid
+SELECT uuid_generate_v4();
+
+-- insert data in user table
+INSERT INTO "user" (
+id,name,gender,birthday,email,login,password,bio) VALUES
+(uuid_generate_v4(),'Farrux',true,'1999-01-01','bekorchijon@mail.ru','farrux','123','I am a programmer'),
+(uuid_generate_v4(),'Umid',true,'2000-01-01','galatibek@mail.ru','umidjon','123','I am a doctor');
+
+
+-- insert data in post table
+INSERT INTO "post" (
+id,user_id,title,body) VALUES
+(uuid_generate_v4(),(SELECT id FROM "user" WHERE name='Farrux'),'First post','This is my first post'),
+(uuid_generate_v4(),(SELECT id FROM "user" WHERE name='Umid'),'Second post','This is my second post');
+
+-- insert data in comment table
+INSERT INTO "comment" (
+id,user_id,post_id,body) VALUES
+(uuid_generate_v4(),(SELECT id FROM "user" WHERE name='Farrux'),(SELECT id FROM "post" WHERE title='First post'),'This is my first comment'),
+(uuid_generate_v4(),(SELECT id FROM "user" WHERE name='Umid'),(SELECT id FROM "post" WHERE title='Second post'),'This is my second comment');
+
+-- insert data in like table
+INSERT INTO "like" (
+id,user_id,post_id) VALUES
+(uuid_generate_v4(),(SELECT id FROM "user" WHERE name='Farrux'),(SELECT id FROM "post" WHERE title='First post')),
+(uuid_generate_v4(),(SELECT id FROM "user" WHERE name='Umid'),(SELECT id FROM "post" WHERE title='Second post'));
+
+-- insert data in notification table
+INSERT INTO "notification" (
+id,user_id,type,body) VALUES
+(uuid_generate_v4(),(SELECT id FROM "user" WHERE name='Farrux'),'like','Farrux liked your post'),
+(uuid_generate_v4(),(SELECT id FROM "user" WHERE name='Umid'),'comment','Umid commented your post');
+
+-- insert data in message table
+INSERT INTO "message" (
+id,sender_id,receiver_id,body) VALUES
+(uuid_generate_v4(),(SELECT id FROM "user" WHERE name='Farrux'),(SELECT id FROM "user" WHERE name='Umid'),'Hello Umid'),
+(uuid_generate_v4(),(SELECT id FROM "user" WHERE name='Umid'),(SELECT id FROM "user" WHERE name='Farrux'),'Hello Farrux');
+
+
+-- insert data in author table
+INSERT INTO "author" (
+id,name) VALUES
+(uuid_generate_v4(),'Author 1'),
+(uuid_generate_v4(),'Author 2');
+
+-- insert data in book table
+INSERT INTO "book" (
+id,title,author,description) VALUES
+(uuid_generate_v4(),'Book 1',(SELECT id FROM "author" WHERE name='Author 1'),'Description 1'),
+(uuid_generate_v4(),'Book 2',(SELECT id FROM "author" WHERE name='Author 2'),'Description 2');
