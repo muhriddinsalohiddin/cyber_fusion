@@ -5,9 +5,10 @@ import "fmt"
 const (
 	host     = "localhost"
 	pPort    = "5432"
-	user     = "kali"
-	password = "963"
+	user     = "postgres"
+	password = "1"
 	db       = "instagram"
+
 )
 
 var (

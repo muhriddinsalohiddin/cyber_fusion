@@ -12,6 +12,17 @@ type Api struct {
 	stg *storage.Storage
 }
 
+type Author struct {
+	Id        string `json:"id"`
+	Name      string `json:"name"`
+	CreatedAt string `json:"created_at"`
+	UpdatedAt string `json:"updated_at"`
+}
+type AuthorList struct {
+	Authors []*Author `json:"authors"`
+	Count   int       `json:"count"`
+}
+
 func NewApi(stg *storage.Storage) *Api {
 
 	f := fiber.New()
@@ -29,10 +40,18 @@ func NewApi(stg *storage.Storage) *Api {
 	{
 		u := f.Group("user")
 		u.Post("/", a.CreateUser)
+
 		// u.Get("/", a.GetUser)
 		// u.Get("/:id", a.GetByIdUser)
 		// u.Put("/", a.UpdateUser)
 		// u.Delete("/", a.DeleteUser)
+	}
+	{
+		b := f.Group("author")
+		b.Post("/", a.CreateAuthor)
+		b.Put("/:id", a.UpdateAuthor)
+		b.Get("/", a.GetAuthorList)
+		b.Delete("/", a.DeleteAuthor)
 	}
 
 	{
