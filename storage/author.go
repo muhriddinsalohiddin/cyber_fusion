@@ -12,16 +12,8 @@ type Author struct {
 	db *sql.DB
 }
 
-type AuthorList struct {
-	db *sql.DB
-}
-
 func NewAuthor(db *sql.DB) *Author {
 	return &Author{db: db}
-}
-
-func NewAuthorList(db *sql.DB) *AuthorList {
-	return &AuthorList{db: db}
 }
 
 func (r *Author) CreateAuthor(u *models.Author) error {
@@ -40,8 +32,9 @@ func (r *Author) CreateAuthor(u *models.Author) error {
 	return nil
 }
 
-func (r *AuthorList) GetAuthorList(m *models.AuthorList) error {
-	// var resp models.AuthorList
+func (r *Author) GetList() (*models.AuthorList, error) {
+	// var m *models.Author
+	var res models.AuthorList
 	query := `
 		SELECT
 			id,
@@ -51,8 +44,9 @@ func (r *AuthorList) GetAuthorList(m *models.AuthorList) error {
 		FROM "author"`
 	rows, err := r.db.Query(query)
 	if err != nil {
-		return err
+		return nil, err
 	}
+
 	defer func() {
 		err = rows.Close()
 		if err != nil {
@@ -69,53 +63,51 @@ func (r *AuthorList) GetAuthorList(m *models.AuthorList) error {
 			&b.Id,
 			&b.Name,
 			&b.CreatedAt,
-			// &b.UpdatedAt,
 			&updated,
 		)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		if updated.Valid {
 			b.UpdatedAt = updated.String
 		}
 
-		m.Authors = append(m.Authors, &b)
+		res.Authors = append(res.Authors, &b)
 	}
 
-	err = r.db.QueryRow(`SELECT COUNT(1) FROM "author"`).Scan(&m.Count)
+	err = r.db.QueryRow(`SELECT COUNT(1) FROM "author"`).
+		Scan(&res.Count)
 
-	return err
+	return &res, err
 }
 
-func (r *Author) AuthorUpdate(b *models.Author, id string) error {
-	fmt.Println(id, "xaxa")
+func (r *Author) Update(b *models.Author, id *string) error {
 	res, err := r.db.Exec(`
-        UPDATE "author" SET
-            name = $2,
-            created_at = $3,
-            updated_at = NOW()
-        WHERE id = $1`,
+        UPDATE 
+			"author" 
+		SET
+            name = $2
+        WHERE 
+			id = $1`,
 		id,
-		b.Name, 
-		b.CreatedAt,
-		b.UpdatedAt,
+		b.Name,
 	)
+	
 
-	rows, _ := res.RowsAffected()
-	if rows == 0 {
-		return fmt.Errorf("bunaqa idlik user yoq aka")
+	if rowsAffected, err := res.RowsAffected(); err != nil {
+		return fmt.Errorf("Update funksiyasida xato (RowsAffected): %v", err)
+	} else if rowsAffected == 0 {
+		return fmt.Errorf("bunday id topilmadi:" + err.Error())
 	}
-
-	fmt.Println(res)
 
 	return err
 }
 
-func (r *Author) AuthorDelete(m *models.Author) error {
+func (r *Author) Delete(m *models.Author) error {
 	_, err := r.db.Exec(`
-	DELETE FROM 
-		"author" 
-	WHERE 
+	DELETE FROM
+		"author"
+	WHERE
 		id = $1
 	`, m.Id)
 
