@@ -74,6 +74,4 @@ CREATE TABLE "author" (
     updated_at TIMESTAMP
 ); 
 
-insert into "author" (id, name) Values (
-    'e920be98-1512-42cf-a94f-f4008ff41160', 'Alisher Navoiy'
-);
+UPDATE "book" set  title = &2, author = &3, description = &4  where id = %1;

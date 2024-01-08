@@ -7,10 +7,10 @@ import (
 )
 
 type Storage struct {
-	db         *sql.DB
-	User       *User
-	Author     *Author
-	Post *Post
+	db   *sql.DB
+	User *User
+	Books *Books
+	// BooksList *BooksList
 }
 
 func NewStorage(connStr string) *Storage {
@@ -25,10 +25,10 @@ func NewStorage(connStr string) *Storage {
 	}
 
 	return &Storage{
-		db:         db,
-		User:       NewUser(db),
-		Author:     NewAuthor(db),
-		Post:       NewPost(db),
+		db:   db,
+		User: NewUser(db),
+		Books : NewBooks(db),
+		// BooksList: NewBooksList(db),
 	}
 }
 
