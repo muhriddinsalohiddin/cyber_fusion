@@ -11,7 +11,7 @@ type Message struct {
 
 type ListMessage struct {
 	Messages []*Message `json:"messages"`
-	Cout     int        `json:"count"`
+	Count     int        `json:"count"`
 }
 type ListMessageReq struct {
 	SenderId   string

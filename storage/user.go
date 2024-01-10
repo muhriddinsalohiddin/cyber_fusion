@@ -3,6 +3,7 @@ package storage
 import (
 	"app/models"
 	"database/sql"
+	"encoding/json"
 	"fmt"
 
 	"github.com/google/uuid"
@@ -58,21 +59,124 @@ func (d *User) Delete(id string) error {
 }
 
 func (n *User) GetById(id string) (*models.User, error) {
-	var updatedAt sql.NullString
-	var u models.User
-	err := n.db.QueryRow(`SELECT id, 
-	name, 
-	gender, 
-	birthday, 
-	email, 
-	login, 
-	password, 
-	bio, 
-	to_char(created_at, 'YYYY-MM-DD') as created_at,
-	to_char(updated_at, 'YYYY-MM-DD') as updated_at 
-	FROM 
-	"user" 
-	where id=$1`, id).Scan(
+	var (
+		updatedAt     sql.NullString
+		u             models.User
+		messages      string
+		notifications string
+		posts         string
+		query         = `
+		SELECT 
+    u.id, 
+    u.name, 
+    u.gender, 
+    u.birthday, 
+    u.email, 
+    u.login, 
+    u.password, 
+    u.bio, 
+    to_char(u.created_at, 'YYYY-MM-DD') as created_at,
+    to_char(u.updated_at, 'YYYY-MM-DD') as updated_at,
+    COALESCE(
+      (
+        SELECT 
+        json_agg(
+          json_build_object(
+            'id', m.id,
+            'sender_id', m.sender_id,
+            'receiver_id', m.receiver_id,
+            'body', m.body,
+            'created_at', to_char(m.created_at, 'YYYY-MM-DD'),
+            'updated_at', to_char(m.updated_at, 'YYYY-MM-DD')
+          )
+        )
+        FROM "message" m
+        WHERE u.id = m.sender_id 
+      ),
+      '[]'
+    ) as messages, 
+    COALESCE(
+      (
+        SELECT 
+        json_agg(
+        	json_build_object(
+            'id', n.id,
+            'user_id', n.user_id,
+            'type', n.type,
+            'body', n.body,
+            'created_at', to_char(n.created_at, 'YYYY-MM-DD')
+          )
+        )
+        FROM "notification" n
+        WHERE u.id = n.user_id 
+      ),
+      '[]'
+    ) as notifications, 
+    COALESCE(
+      (
+      	SELECT 
+        json_agg(
+          json_build_object(
+        	  'id', p.id, 
+        	  'user_id', p.user_id, 
+        	  'title', p.title, 
+        	  'body', p.body, 
+        	  'created_at', to_char(p.created_at, 'YYYY-MM-DD'),
+        	  'updated_at', to_char(p.updated_at, 'YYYY-MM-DD'),
+
+        	  'likes', COALESCE(
+              (
+              	SELECT 
+            		json_agg(
+                  json_build_object(
+                    'id', l.id,
+                    'user_id', l.user_id,
+                    'post_id', l.post_id,
+                    'created_at', to_char(l.created_at, 'YYYY-MM-DD')
+                  )
+                )
+                FROM "like" l
+                WHERE p.id = l.post_id
+              ),
+              '[]'
+            ),
+
+            'comments', COALESCE(
+            	(
+                SELECT 
+                json_agg(
+                	json_build_object(
+                  	'id', c.id,
+                  	'user_id', c.user_id,
+                  	'post_id', c.post_id,
+                  	'body', c.body,
+                  	'created_at', to_char(c.created_at, 'YYYY-MM-DD'),
+                  	'updated_at', to_char(c.created_at, 'YYYY-MM-DD')
+                  )
+                )
+                FROM "comment" c
+                WHERE p.id = c.post_id
+              ),
+              '[]'
+            )
+						
+          )
+        )
+        FROM "post" p
+        WHERE u.id = p.user_id 
+      ),
+      '[]'
+    ) as posts 
+		FROM 
+    	"user" u
+		WHERE 
+    	u.id = $1
+		GROUP BY  
+    	u.id;
+	`
+	)
+
+	err := n.db.QueryRow(query, id).Scan(
 		&u.Id,
 		&u.Name,
 		&u.Gender,
@@ -82,20 +186,47 @@ func (n *User) GetById(id string) (*models.User, error) {
 		&u.Password,
 		&u.Bio,
 		&u.CreatedAt,
-		&u.UpdetadAt)
+		&updatedAt,
+		&messages,
+		&notifications,
+		&posts,
+	)
+
+	if err != nil {
+		return nil, err
+	}
 
 	if updatedAt.Valid {
 		u.UpdetadAt = updatedAt.String
 	}
 
-	return &u, err
+	// Unmarshal the messages string into []*models.Message
+	err = json.Unmarshal([]byte(messages), &u.Messages)
+	if err != nil {
+		return nil, err
+	}
 
+	// Unmarshal the notifications string into []*models.Message
+	err = json.Unmarshal([]byte(notifications), &u.Notifications)
+	if err != nil {
+		return nil, err
+	}
+
+	// Unmarshal the posts string into []*models.Post
+	err = json.Unmarshal([]byte(posts), &u.Posts)
+	if err != nil {
+		return nil, err
+	}
+
+	return &u, nil
 }
+
 func (n *User) Get(req *models.UserReq) (*models.Users, error) {
 	var (
 		updatedAt sql.NullString
 		m         models.Users
-		filter    = "WHERE true"
+		filter    = " WHERE true "
+		end       = " GROUP BY  u.id "
 		arr       []any
 	)
 
@@ -115,18 +246,109 @@ func (n *User) Get(req *models.UserReq) (*models.Users, error) {
 	}
 
 	query := `
-	SELECT id, 
-		name, 
-		gender, 
-		birthday, 
-		email, 
-		login, 
-		password, 
-		bio, 
-		to_char(created_at, 'YYYY-MM-DD') as created_at,
-		to_char(updated_at, 'YYYY-MM-DD') as updated_at 
-	FROM "user" ` + filter
-	fmt.Println("query", query, arr)
+	SELECT 
+    u.id, 
+    u.name, 
+    u.gender, 
+    u.birthday, 
+    u.email, 
+    u.login, 
+    u.password, 
+    u.bio, 
+    to_char(u.created_at, 'YYYY-MM-DD') as created_at,
+    to_char(u.updated_at, 'YYYY-MM-DD') as updated_at,
+    COALESCE(
+      (
+        SELECT 
+        json_agg(
+          json_build_object(
+            'id', m.id,
+            'sender_id', m.sender_id,
+            'receiver_id', m.receiver_id,
+            'body', m.body,
+            'created_at', to_char(m.created_at, 'YYYY-MM-DD'),
+            'updated_at', to_char(m.updated_at, 'YYYY-MM-DD')
+          )
+        )
+        FROM "message" m
+        WHERE u.id = m.sender_id 
+      ),
+      '[]'
+    ) as messages, 
+    COALESCE(
+      (
+        SELECT 
+        json_agg(
+        	json_build_object(
+            'id', n.id,
+            'user_id', n.user_id,
+            'type', n.type,
+            'body', n.body,
+            'created_at', to_char(n.created_at, 'YYYY-MM-DD')
+          )
+        )
+        FROM "notification" n
+        WHERE u.id = n.user_id 
+      ),
+      '[]'
+    ) as notifications, 
+    COALESCE(
+      (
+      	SELECT 
+        json_agg(
+          json_build_object(
+        	  'id', p.id, 
+        	  'user_id', p.user_id, 
+        	  'title', p.title, 
+        	  'body', p.body, 
+        	  'created_at', to_char(p.created_at, 'YYYY-MM-DD'),
+        	  'updated_at', to_char(p.updated_at, 'YYYY-MM-DD'),
+
+        	  'likes', COALESCE(
+              (
+              	SELECT 
+            		json_agg(
+                  json_build_object(
+                    'id', l.id,
+                    'user_id', l.user_id,
+                    'post_id', l.post_id,
+                    'created_at', to_char(l.created_at, 'YYYY-MM-DD')
+                  )
+                )
+                FROM "like" l
+                WHERE p.id = l.post_id
+              ),
+              '[]'
+            ),
+
+            'comments', COALESCE(
+            	(
+                SELECT 
+                json_agg(
+                	json_build_object(
+                  	'id', c.id,
+                  	'user_id', c.user_id,
+                  	'post_id', c.post_id,
+                  	'body', c.body,
+                  	'created_at', to_char(c.created_at, 'YYYY-MM-DD'),
+                  	'updated_at', to_char(c.created_at, 'YYYY-MM-DD')
+                  )
+                )
+                FROM "comment" c
+                WHERE p.id = c.post_id
+              ),
+              '[]'
+            )
+          )
+        )
+        FROM "post" p
+        WHERE u.id = p.user_id 
+      ),
+      '[]'
+    ) as posts 
+		FROM 
+    	"user" u
+	` + filter + end
 	rows, err := n.db.Query(query, arr...)
 	if err != nil {
 		return nil, err
@@ -135,8 +357,12 @@ func (n *User) Get(req *models.UserReq) (*models.Users, error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		var u models.User
-
+		var (
+			u             models.User
+			messages      string
+			notifications string
+			posts         string
+		)
 		err = rows.Scan(
 			&u.Id,
 			&u.Name,
@@ -148,6 +374,9 @@ func (n *User) Get(req *models.UserReq) (*models.Users, error) {
 			&u.Bio,
 			&u.CreatedAt,
 			&updatedAt,
+			&messages,
+			&notifications,
+			&posts,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("Get dagi rowsni scan qilishda xatolik bor ekan xatolik: " + err.Error())
@@ -157,6 +386,23 @@ func (n *User) Get(req *models.UserReq) (*models.Users, error) {
 			u.UpdetadAt = updatedAt.String
 		} else {
 			u.UpdetadAt = "bu profilda yangilanish kiritilmagan"
+		}
+		// Unmarshal the messages string into []*models.Message
+		err = json.Unmarshal([]byte(messages), &u.Messages)
+		if err != nil {
+			return nil, err
+		}
+
+		// Unmarshal the notification string into []*models.Notification
+		err = json.Unmarshal([]byte(notifications), &u.Notifications)
+		if err != nil {
+			return nil, err
+		}
+
+		// Unmarshal the posts string into []*models.Post
+		err = json.Unmarshal([]byte(posts), &u.Posts)
+		if err != nil {
+			return nil, err
 		}
 
 		m.Users = append(m.Users, &u)

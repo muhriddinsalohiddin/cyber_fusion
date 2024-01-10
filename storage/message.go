@@ -71,7 +71,12 @@ func (r *Message) GetMessageList(req *models.ListMessageReq) (*models.ListMessag
 		m     models.ListMessage
 		query = `
 			SELECT
-				id,sender_id,receiver_id,body,created_at,updated_at 
+				id,
+				sender_id,
+				receiver_id,
+				body,
+				to_char(created_at, 'YYYY-MM-DD') as created_at,
+				to_char(updated_at, 'YYYY-MM-DD') as updated_at 
 			FROM
 				"message"`
 		filter = " WHERE 1=1 "
@@ -121,7 +126,7 @@ func (r *Message) GetMessageList(req *models.ListMessageReq) (*models.ListMessag
 		m.Messages = append(m.Messages, &message)
 	}
 
-	err = r.db.QueryRow(`SELECT COUNT(1) FROM "message"`+filter, args...).Scan(&m.Cout)
+	err = r.db.QueryRow(`SELECT COUNT(1) FROM "message"`+filter, args...).Scan(&m.Count)
 
 	return &m, err
 }
@@ -133,7 +138,12 @@ func (r *Message) GetMessage(id *string) (*models.Message, error) {
 	)
 	err := r.db.QueryRow(`
 	SELECT 
-		id,sender_id,receiver_id,body,created_at,updated_at
+		id,
+		sender_id,
+		receiver_id,
+		body,
+		to_char(created_at, 'YYYY-MM-DD') as created_at,
+		to_char(updated_at, 'YYYY-MM-DD') as updated_at 
 	FROM
 		"message"
 	WHERE
