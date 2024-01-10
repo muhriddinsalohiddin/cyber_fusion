@@ -22,13 +22,47 @@ func (a *Api) CreateUser(c *fiber.Ctx) error {
 	return handlerResponse(c, http.StatusCreated, "SUCCESS")
 }
 
+func (a *Api) GetByIdWithAllItems(c *fiber.Ctx) error {
+	id := c.Params("id")
+
+	user, err := a.stg.User.GetByIdWithAllItems(id)
+	if err != nil {
+		return handlerResponse(c, http.StatusInternalServerError, "get user"+err.Error())
+	}
+
+	return handlerResponse(c, http.StatusCreated, user)
+}
 func (a *Api) GetByIdUser(c *fiber.Ctx) error {
 	id := c.Params("id")
 
 	user, err := a.stg.User.GetById(id)
 	if err != nil {
-		return err
+		return handlerResponse(c, http.StatusInternalServerError, "get user"+err.Error())
 	}
+
+	comments, err := a.stg.Comment.Getlist(&models.Comment{
+		UserId: user.Id,
+	})
+	if err != nil {
+		return handlerResponse(c, http.StatusInternalServerError, "get comment"+err.Error())
+	}
+
+	user.Comments = comments.Comments
+
+	notifications, err := a.stg.Notification.Getlist(&models.Notification{
+		UserId: user.Id,
+	})
+	if err != nil {
+		return handlerResponse(c, http.StatusInternalServerError, "get notification"+err.Error())
+	}
+	user.Notifications = notifications.Notifications
+
+	posts, err := a.stg.Post.GetlistWithComments(user.Id)
+
+	if err != nil {
+		return handlerResponse(c, http.StatusInternalServerError, "get post"+err.Error())
+	}
+	user.Posts = posts.Post
 
 	return handlerResponse(c, http.StatusCreated, user)
 }

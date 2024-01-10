@@ -68,7 +68,7 @@ func (c *Comment) DeleteComment(id *string) error {
 	if err != nil || i == 0 {
 		return sql.ErrNoRows
 	}
-	
+
 	return nil
 }
 func (r *Comment) Getlist(req *models.Comment) (*models.Listcha, error) {
@@ -83,7 +83,7 @@ func (r *Comment) Getlist(req *models.Comment) (*models.Listcha, error) {
 		created_at,
 		updated_at
 	FROM "comment"`
-		filter = " Where 1=1 "
+		filter = " WHERE 1=1 "
 		args   []any
 	)
 	if req.UserId != "" {

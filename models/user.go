@@ -1,16 +1,21 @@
 package models
 
 type User struct {
-	Id        string `json:"id"`
-	Name      string `json:"name"`
-	Gender    bool   `json:"gender"`
-	Birthday  string `json:"birthday"`
-	Email     string `json:"email"`
-	Login     string `json:"login"`
-	Password  string `json:"password"`
-	Bio       string `json:"bio"`
-	CreatedAt string `json:"created_at"`
-	UpdetadAt string `json:"updetad_at"`
+	Id            string          `json:"id"`
+	Name          string          `json:"name"`
+	Gender        bool            `json:"gender"`
+	Birthday      string          `json:"birthday"`
+	Email         string          `json:"email"`
+	Login         string          `json:"login"`
+	Password      string          `json:"password"`
+	Bio           string          `json:"bio"`
+	CreatedAt     string          `json:"created_at"`
+	UpdetadAt     string          `json:"updetad_at"`
+	Comments      []*Comment      `json:"comments"`
+	Notifications []*Notification `json:"notifications"`
+	Posts         []*Post         `json:"posts"`
+	Message       []*Message      `json:"messages"`
+	Likes         []*Like         `json:"likes"`
 }
 
 type Users struct {

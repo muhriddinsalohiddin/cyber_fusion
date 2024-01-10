@@ -101,6 +101,121 @@ func (r *Post) GetPostlist() (*models.PostListResp, error) {
 
 	return &m, err
 }
+func (r *Post) GetlistWithComments(user_id string) (*models.PostListResp, error) {
+	var (
+		posts models.PostListResp
+	)
+
+	query := `
+	select 
+		id,
+		title,
+		user_id,
+		body,
+		created_at,
+		updated_at
+	from post p
+	where p.user_id = $1`
+
+	rows, err := r.db.Query(query, user_id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var (
+			p          models.Post
+			updated_at sql.NullString
+		)
+		err = rows.Scan(
+			&p.Id,
+			&p.Title,
+			&p.UserId,
+			&p.Body,
+			&p.CreatedAt,
+			&updated_at,
+		)
+		if err != nil {
+			return nil, err
+		}
+		p.UpdatedAt = updated_at.String
+
+		// Comment Started
+		queryComment := `
+		select
+			id,
+			user_id,
+			post_id,
+			body,
+			created_at,
+			updated_at
+		from comment c
+		where c.post_id = $1`
+
+		rowsComment, err := r.db.Query(queryComment, p.Id)
+		if err != nil {
+			return nil, err
+		}
+		defer rowsComment.Close()
+
+		for rowsComment.Next() {
+			var (
+				c         models.Comment
+				updatedAt sql.NullString
+			)
+			err = rowsComment.Scan(
+				&c.Id,
+				&c.UserId,
+				&c.PostId,
+				&c.Body,
+				&c.CreatedAt,
+				&updatedAt,
+			)
+			if err != nil {
+				return nil, err
+			}
+			c.UpdatedAt = updatedAt.String
+			p.Comments = append(p.Comments, &c)
+		}
+
+		// Like Started
+		queryLike := `
+		select
+			id,
+			user_id,
+			post_id,
+			created_at
+		from "like" l
+		where l.post_id = $1`
+
+		rowsLike, err := r.db.Query(queryLike, p.Id)
+		if err != nil {
+			return nil, err
+		}
+		defer rowsLike.Close()
+
+		for rowsLike.Next() {
+			var (
+				l models.Like
+			)
+			err = rowsLike.Scan(
+				&l.Id,
+				&l.UserId,
+				&l.PostId,
+				&l.CreatedAt,
+			)
+			if err != nil {
+				return nil, err
+			}
+			p.Likes = append(p.Likes, &l)
+		}
+
+		posts.Post = append(posts.Post, &p)
+	}
+
+	return &posts, nil
+}
 func (r *Post) GetByIdPost(id string) (*models.Post, error) {
 	var post models.Post
 	query := `
