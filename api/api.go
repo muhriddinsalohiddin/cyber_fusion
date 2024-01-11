@@ -4,9 +4,8 @@ import (
 	"app/config"
 	"app/storage"
 
-	//"database/sql"
-
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 )
 
 type Api struct {
@@ -15,12 +14,29 @@ type Api struct {
 }
 
 func NewApi(stg *storage.Storage) *Api {
-
 	f := fiber.New()
 	a := &Api{
 		f:   f,
 		stg: stg,
 	}
+
+	// Enable CORS for all routes
+	f.Use(cors.New(cors.Config{
+		AllowOrigins:     "*", // You can specify specific origins instead of "*"
+		AllowMethods:     "GET,POST,PUT,DELETE",
+		AllowHeaders:     "Content-Type,Authorization",
+		ExposeHeaders:    "",
+		AllowCredentials: true,
+		MaxAge:           600,
+	}))
+
+	a.registerRoutes()
+
+	return a
+}
+
+func (a *Api) registerRoutes() {
+	f := a.f
 
 	f.Get("/ping", Ping)
 	f.Post("/ping", PostPing)
@@ -87,8 +103,6 @@ func NewApi(stg *storage.Storage) *Api {
 		c.Delete("/:id", a.DeleteComment)
 		c.Put("/:id", a.UpdateComment)
 	}
-	return a
-
 }
 
 func (a *Api) Run() {

@@ -2,6 +2,7 @@ package api
 
 import (
 	"app/models"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -39,6 +40,7 @@ func (a *Api) GetUsers(c *fiber.Ctx) error {
 		limit  = 0
 		err    error
 	)
+	fmt.Println("salom")
 	limit, err = a.getLimitAndOffset(c, "limit")
 	if err != nil {
 		return handlerResponse(c, http.StatusBadRequest, "limitni intga o'girishda xatolik 40: "+err.Error())

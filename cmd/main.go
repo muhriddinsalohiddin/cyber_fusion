@@ -7,7 +7,6 @@ import (
 )
 
 func main() {
-
 	stg := storage.NewStorage(config.ConnStr)
 
 	defer stg.Close()
@@ -15,5 +14,5 @@ func main() {
 	h := api.NewApi(stg)
 
 	h.Run()
-	
+
 }
