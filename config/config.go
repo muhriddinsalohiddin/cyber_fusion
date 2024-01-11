@@ -1,6 +1,9 @@
 package config
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 const (
 	host     = "localhost"
@@ -13,5 +16,7 @@ const (
 var (
 	ConnStr = fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		host, pPort, user, password, db)
-	Port = ":8080"
+	Port                = ":8080"
+	TOKEN_SECRET        = "secret"
+	AccessTokenDuration = time.Second * 25
 )

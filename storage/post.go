@@ -36,10 +36,8 @@ func (r *Post) Delete(m *models.Post) error {
 	WHERE
 		id=$1
 	`, m.Id)
-	if err != nil {
-		return fmt.Errorf("PDF xato" + err.Error())
-	}
-	return nil
+
+	return err
 }
 
 func (r *Post) Update(n *models.Post) error {

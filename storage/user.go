@@ -36,13 +36,13 @@ func (r *User) Create(u *models.User) error {
 
 func (u *User) Update(u1 models.User, id string) error {
 	_, err := u.db.Exec(`UPDATE "user" SET name=$1, 
-gender=$2, 
-birthday=$3, 
-email=$4, 
-login=$5, 
-password=$6, 
-bio=$7,
-updated_at=now() where id=$8`, u1.Name, u1.Gender, u1.Birthday, u1.Email, u1.Login, u1.Password, u1.Bio, id)
+	gender=$2, 
+	birthday=$3, 
+	email=$4, 
+	login=$5, 
+	password=$6, 
+	bio=$7,
+	updated_at=now() where id=$8`, u1.Name, u1.Gender, u1.Birthday, u1.Email, u1.Login, u1.Password, u1.Bio, id)
 	if err != nil {
 		return err
 	}
@@ -50,6 +50,40 @@ updated_at=now() where id=$8`, u1.Name, u1.Gender, u1.Birthday, u1.Email, u1.Log
 
 }
 
+func (d *User) GetByLogin(login string) (*models.User, error) {
+	var (
+		updatedAt sql.NullString
+		u         models.User
+	)
+
+	err := d.db.QueryRow(`
+	SELECT
+		id, 
+		name, 
+		gender, 
+		to_char(birthday, 'YYYY-MM-DD') as birthday,
+		email, 
+		login, 
+		password, 
+		bio, 
+		to_char(created_at, 'YYYY-MM-DD') as created_at,
+		to_char(updated_at, 'YYYY-MM-DD') as updated_at 
+	FROM "user" 
+	where login=$1`, login).Scan(
+		&u.Id,
+		&u.Name,
+		&u.Gender,
+		&u.Birthday,
+		&u.Email,
+		&u.Login,
+		&u.Password,
+		&u.Bio,
+		&u.CreatedAt,
+		&updatedAt,
+	)
+	u.UpdetadAt = updatedAt.String
+	return &u, err
+}
 func (d *User) Delete(id string) error {
 	_, err := d.db.Exec(`DELETE FROM "user" WHERE id=$1`, id)
 	if err != nil {
@@ -206,6 +240,11 @@ func (n *User) Get(req *models.UserReq) (*models.Users, error) {
 		filter += fmt.Sprintf(" AND created_at BETWEEN $%d AND $%d", len(arr)-1, len(arr))
 	}
 
+	if req.Login != "" {
+		arr = append(arr, req.Login)
+		filter += " AND login=$" + fmt.Sprint(len(arr))
+	}
+
 	if req.Limit != 0 {
 		arr = append(arr, req.Limit)
 		filter += " LIMIT $" + fmt.Sprint(len(arr))
@@ -228,7 +267,7 @@ func (n *User) Get(req *models.UserReq) (*models.Users, error) {
 		to_char(created_at, 'YYYY-MM-DD') as created_at,
 		to_char(updated_at, 'YYYY-MM-DD') as updated_at 
 	FROM "user" ` + filter
-	fmt.Println("query", query, arr)
+
 	rows, err := n.db.Query(query, arr...)
 	if err != nil {
 		return nil, err

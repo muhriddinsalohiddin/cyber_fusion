@@ -4,9 +4,8 @@ import (
 	"app/config"
 	"app/storage"
 
-	//"database/sql"
-
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 )
 
 type Api struct {
@@ -17,14 +16,31 @@ type Api struct {
 func NewApi(stg *storage.Storage) *Api {
 
 	f := fiber.New()
+	f.Use(cors.New(cors.Config{
+		AllowOrigins:     "*",
+		AllowMethods:     "GET,POST,PUT,DELETE",
+		AllowHeaders:     "Content-Type,Authorization",
+		ExposeHeaders:    "",
+		AllowCredentials: true,
+		MaxAge:           600,
+	}))
+
 	a := &Api{
 		f:   f,
 		stg: stg,
 	}
 
+	f.Static("/files", "./files")
+
 	f.Get("/ping", Ping)
 	f.Post("/ping", PostPing)
 
+	{
+		p := f.Group("front")
+		p.Get("/", a.Front)
+	}
+
+	f.Post("/login", a.Login)
 	// user route
 	{
 		u := f.Group("user")
@@ -57,7 +73,7 @@ func NewApi(stg *storage.Storage) *Api {
 	{
 		u := f.Group("post")
 		u.Post("/", a.CreatePost)
-		u.Delete("/", a.DeletePost)
+		u.Delete("/:id", a.DeletePost)
 		u.Put("/", a.UpdatePost)
 		u.Get("/", a.GetPost)
 		u.Get("/:id", a.GetByIdPost)
