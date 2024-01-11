@@ -2,6 +2,8 @@ package api
 
 import (
 	"app/models"
+	"database/sql"
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -12,13 +14,12 @@ import (
 func (a *Api) CreateUser(c *fiber.Ctx) error {
 	var u models.User
 
-	err := c.BodyParser(&u)
-	if err != nil {
-		return handlerResponse(c, http.StatusBadRequest, "body parcerda xatolik 15: "+err.Error())
-	}
-	err = a.stg.User.Create(&u)
-	if err != nil {
-		return handlerResponse(c, http.StatusInternalServerError, err.Error())
+	if err := c.BodyParser(&u); err != nil {
+		// Log the error for debugging purposes
+		fmt.Println("Error parsing request body:", err)
+
+		// Return a descriptive error message to the client
+		return handlerResponse(c, http.StatusBadRequest, "Invalid request body format")
 	}
 	return handlerResponse(c, http.StatusCreated, "SUCCESS")
 }
@@ -100,4 +101,49 @@ func (a *Api) getLimitAndOffset(c *fiber.Ctx, key string) (int, error) {
 		return strconv.Atoi(c.Query(key))
 	}
 	return 0, nil
+}
+
+func (a *Api) LoginUser(c *fiber.Ctx) error {
+	var loginReq models.LoginRequest
+
+	err := c.BodyParser(&loginReq)
+	if err != nil {
+		return handlerResponse(c, http.StatusBadRequest, "body parcerda xatolik: "+err.Error())
+	}
+	user, err := a.GetByUsernameAndPassword(loginReq.Username, loginReq.Password)
+	if err != nil {
+		return handlerResponse(c, http.StatusUnauthorized, "Kirishda xatolik: "+err.Error())
+	}
+
+	return handlerResponse(c, http.StatusOK, user)
+}
+func (us *Api) GetByUsernameAndPassword(username, password string) (*models.User, error) {
+	var user models.User // Initialize user as a struct, not a pointer
+	fmt.Println("GetByUsernameAndPassword called with username:", username)
+
+	if us == nil || us.stg.Storage.DB == nil {
+		return nil, errors.New("database connection is not initialized")
+	}
+
+	query := `SELECT id, name, password FROM "user" WHERE name = $1`
+	row := us.stg.Storage.DB.QueryRow(query, username)
+	// fmt.Println(
+	// 	row.Scan(
+	// 		&user.Id,
+	// 		&user.Name,
+	// 		&user.Password,
+	// 	))
+	err := row.Scan(&user.Id, &user.Name, &user.Password)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, errors.New("user not found")
+		}
+		return nil, fmt.Errorf("error querying database: %v", err)
+	}
+
+	if err != nil {
+		return nil, errors.New("invalid password")
+	}
+
+	return &user, nil
 }

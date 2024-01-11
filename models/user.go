@@ -26,3 +26,8 @@ type UserReq struct {
 	FromDate string `json:"from_date"`
 	ToDate   string `json:"to_date"`
 }
+
+type LoginRequest struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}

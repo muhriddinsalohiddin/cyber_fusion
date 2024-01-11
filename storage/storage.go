@@ -15,6 +15,7 @@ type Storage struct {
 	Notification *Notification
 	Author       *Author
 	Post         *Post
+	Storage      *UserStorageImpl
 }
 
 func NewStorage(connStr string) *Storage {
@@ -37,6 +38,7 @@ func NewStorage(connStr string) *Storage {
 		Notification: NewNotification(db),
 		Author:       NewAuthor(db),
 		Post:         NewPost(db),
+		Storage:      NewUserStorage(db),
 	}
 }
 

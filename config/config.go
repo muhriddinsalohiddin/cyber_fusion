@@ -5,9 +5,9 @@ import "fmt"
 const (
 	host     = "localhost"
 	pPort    = "5432"
-	user     = "general"
-	password = "0320"
-	db       = "instagram"
+	user     = "java"
+	password = "1984"
+	db       = "java"
 )
 
 var (

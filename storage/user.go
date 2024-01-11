@@ -13,6 +13,14 @@ type User struct {
 	db *sql.DB
 }
 
+type UserStorageImpl struct {
+	DB *sql.DB
+}
+
+func NewUserStorage(db *sql.DB) *UserStorageImpl {
+	return &UserStorageImpl{DB: db}
+}
+
 func NewUser(db *sql.DB) *User {
 	return &User{db: db}
 }

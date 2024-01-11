@@ -20,9 +20,8 @@ func NewApi(stg *storage.Storage) *Api {
 		stg: stg,
 	}
 
-	// Enable CORS for all routes
 	f.Use(cors.New(cors.Config{
-		AllowOrigins:     "*", // You can specify specific origins instead of "*"
+		AllowOrigins:     "*",
 		AllowMethods:     "GET,POST,PUT,DELETE",
 		AllowHeaders:     "Content-Type,Authorization",
 		ExposeHeaders:    "",
@@ -50,6 +49,7 @@ func (a *Api) registerRoutes() {
 		u.Put("/:id", a.UpdateUser)
 		u.Delete("/:id", a.DeleteUser)
 	}
+	f.Post("/login", a.LoginUser)
 
 	// book route
 	{
