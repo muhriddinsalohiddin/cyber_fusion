@@ -11,6 +11,9 @@ type User struct {
 	Bio       string `json:"bio"`
 	CreatedAt string `json:"created_at"`
 	UpdetadAt string `json:"updetad_at"`
+	Post []*Post `json:"Post"`
+	Message []*Message `json:"Message"`
+	Notification []*Notification `json:"Notification"` 
 }
 
 type Users struct {

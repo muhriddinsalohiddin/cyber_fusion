@@ -37,13 +37,14 @@ func (r *Books) GetList(req models.LsitBookReq) (*models.BooksList, error) {
 	// var resp models.BooksList
 	var (
 		bs    models.BooksList
+		updatedAt sql.NullString
 		query = ` select
 	id,
 	title,
  	author,
 	description,
-	created_at,
-	updated_at
+		to_char(created_at, 'YYYY-MM-DD') as created_at,
+			to_char(updated_at, 'YYYY-MM-DD') as updated_at 
 	FROM "book"`
 		filter = "Where 1=1"
 		args   []any
@@ -90,6 +91,12 @@ func (r *Books) GetList(req models.LsitBookReq) (*models.BooksList, error) {
 		if err != nil {
 			return nil, fmt.Errorf("Dear Friend in getList for scan don't word" + err.Error())
 		}
+		if updatedAt.Valid {
+			b.UpdatedAt = updatedAt.String
+		} else {
+			b.UpdatedAt = "bu profilda yangilanish kiritilmagan"
+		}
+
 		bs.Books = append(bs.Books, &b)
 	}
 	err = r.db.QueryRow(`Select Count(1) from "book"`+filter, args...).Scan(&bs.Count)
@@ -101,7 +108,7 @@ func (r *Books) UpdateBook(b *models.Books, id *string) error {
 UPDATE "book" SET 
 title = $2,
  author = $3,
-  description = $4
+  description = $4,
 	where id = $1`,
 		id,
 		b.Title,

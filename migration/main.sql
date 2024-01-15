@@ -131,3 +131,33 @@ INSERT INTO "book" (
 id,title,author,description) VALUES
 (uuid_generate_v4(),'Book 1',(SELECT id FROM "author" WHERE name='Author 1'),'Description 1'),
 (uuid_generate_v4(),'Book 2',(SELECT id FROM "author" WHERE name='Author 2'),'Description 2');
+
+
+SELECT "author".id, "author".name, "book".id, "book".title, "book".description  FROM "author" JOIN "book" ON "author".id = "book".author;
+
+--  SELECT Table1.column1, Table1.column2, Table2.column3
+-- FROM Table1
+-- JOIN Table2 ON Table1.id = Table2.id;
+
+SELECT "post".id, "post".title, "post".body, "comment".
+body, "like".id FROM "post"
+Join "comment" on "post".id = "comment".id; 
+
+-- SELECT "post".id, "post".title, "post".body, "comment".body AS comment_body, "like".id AS like_id
+-- FROM "post"
+-- JOIN "comment" ON "post".id = "comment".post_id
+-- LEFT JOIN "like" ON "post".id = "like".post_id;
+
+
+-- SELECT "user".id AS user_id, "user".name AS user_name, "post".id  "comment".body, "like".id AS post_id, "post".title, "post".body, 
+-- FROM "user"
+-- JOIN "post" ON "user".id = "post".user_id;
+
+-- SELECT "user".id AS user_id, "user".name AS user_name,
+--        "post".id AS post_id, "post".title, "post".body,
+--        "comment".body AS comment_body, "like".id AS like_id
+-- FROM "user"
+-- JOIN "post" ON "user".id = "post".user_id
+-- LEFT JOIN "comment" ON "post".id = "comment".post_id
+-- LEFT JOIN "like" ON "post".id = "like".post_id;
+

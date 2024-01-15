@@ -7,6 +7,8 @@ type Post struct {
 	Body      string `json:"body"`
 	CreatedAt string `json:"created_at"`
 	UpdatedAt string `json:"updated_at"`
+	Comment []*Comment `json:"Comment"`
+	Like  	 []*Like `json:"Like"`
 }
 type PostListResp struct {
 	Post  []*Post `json:"post"`
